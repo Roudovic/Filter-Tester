@@ -10,9 +10,16 @@
 #include <cmath>
 #include <ctime>
 
+
+#include "cuckoofilter.h"
+
+#include "simd-block.h"
+
+
+
 #define __STDC_WANT_LIB_EXT1__ 1
 
-#define FP 0.0003
+#define FP 0.005
 
 
 Test::Test()
@@ -24,6 +31,7 @@ Test::~Test()
 {
     //dtor
 }
+
 
 void gen_random(char *s, const int len) {
     static const char alphanum[] =
