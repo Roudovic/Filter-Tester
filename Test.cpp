@@ -13,13 +13,15 @@
 
 #include "cuckoofilter.h"
 
-#include "simd-block.h"
+
 
 
 
 #define __STDC_WANT_LIB_EXT1__ 1
 
 #define FP 0.005
+
+
 
 
 Test::Test()
@@ -53,7 +55,7 @@ int main(int argc, char* argv[]){
 const uint16_t size_input = 40;
 const uint16_t max_size_input = 100;
 
-const uint16_t n = 3000;
+const uint16_t n = 1000;
 
 
 
@@ -72,6 +74,7 @@ std::size_t l = size_input;
 
 BloomFilter_1 bloom = BloomFilter_1(m,k);
 BloomFilter Sbloom = BloomFilter(m, k);
+cuckoofilter::CuckooFilter<size_t,12> filter(m);
 
 
 for(unsigned int i = 0; i<n; i++){
@@ -83,6 +86,9 @@ for(unsigned int i = 0; i<n; i++){
   //  bloom1.add((const uint8_t*)s, l);
     bloom.add((const uint8_t*)s, l);
 	Sbloom.add((const uint8_t*)s, l);
+    filter.Add(i);
+   std::cout<< filter.Contain(i)<<std::endl;
+   std::cout<< filter.Contain(i+1)<<std::endl;
 
 }
 std::cout<< "done" << std::endl;
@@ -122,6 +128,19 @@ for (unsigned int i = 0; i<2 * n; i++) {
 std::cout << "it took " << diff.count() << " s " << "for the Bloom Filter " <<std::endl;
 std::cout << "Its false positive rate is " << (double)fp / n << std::endl;
 
+
+t1 = std::chrono::system_clock::now();
+fp = 0;
+for (unsigned int i = 0; i<2 * n; i++) {
+	std::cout<<
+	filter.Contain(i)<<std::endl;
+	if (i > n && filter.Contain(i)==0)  { fp++; }
+		//<<std::endl ;
+}
+ t2 = std::chrono::system_clock::now();
+ diff = t2 - t1;
+std::cout << "it took " << diff.count() << " s " << "for the Cuckoo Filter " <<std::endl;
+std::cout << "Its false positive rate is " << (double)fp / n << std::endl;
 
 //std::cout<<bloom.possiblyContains((const uint8_t*)data1, l)<<std::endl ;
 
