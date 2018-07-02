@@ -25,7 +25,6 @@
 
 
 
-
 Test2::Test2()
 {
     //ctor
@@ -50,25 +49,23 @@ void gen_random(char *s, const int len) {
     s[len] = 0;
 }
 
-int main(int argc, char* argv[]){
+int main(){
 
 
 
 const uint16_t size_input = 40;
 const uint16_t max_size_input = 100;
 
-const uint32_t n = 128;
-const uint32_t un_sur_tx_pos = 600;
+const uint32_t n = 150;
+const uint32_t un_sur_tx_pos = 300;
 
 
 
 uint64_t m = floor(-1.44*n*log2(FP));
 uint8_t k = floor(log(2)*m/n);
 printf("k=%d\n",k);
-std::cout<<m<<std::endl;
+std::cout<< "filter size is : " <<m<<std::endl;
 
-
-const uint8_t fingerprint_size = floor(log2(8/FP));
 
 
 char s[max_size_input] = " ";
@@ -80,8 +77,13 @@ std::size_t l = size_input;
 BloomFilter_1 bloom = BloomFilter_1(m,k);
 BloomFilter Sbloom = BloomFilter(m, k);
 
+//Cuckoo filter
+const uint8_t fingerprint_size = floor(log2(8/FP));
 cuckoofilter::CuckooFilter<int,fingerprint_size> filter(n);
 
+
+//Other Bloom Filter implementation with optimally chosen parameters
+//And ability to insert integers
 
 bloom_parameters parameters;
 
@@ -91,25 +93,26 @@ parameters.false_positive_probability = FP;
 parameters.compute_optimal_parameters();
 bloom_filter newbloom(parameters);
 
+// SIMD Based Blocked Bloom Filter -- Close to the Ultra-fast Bloom filter implementation
+
+SimdBlockFilter<> simdbloom(ceil(log2( 2*n * 8.0 / CHAR_BIT)));
 
 
-SimdBlockFilter<> simdbloom(ceil(log2(n * 8.0 / CHAR_BIT)));
 
 for(unsigned int i = 0; i<n; i++){
-   // memset(data1,0,max_size_input);
+    
 	gen_random(s,size_input);
 	strcpy(testingvalues[i],s);
+    
     srand(i);
     integer_testingvalues[i]=rand();
 
-    //std::cout << s << std::endl;
-  //  bloom1.add((const uint8_t*)s, l);
     bloom.add((const uint8_t*)s, l);
 	Sbloom.add((const uint8_t*)s, l);
-    srand(i);
+    
     filter.Add(integer_testingvalues[i]);
     newbloom.insert(integer_testingvalues[i]);
-    //simdbloom.Add((uint64_t)i);
+    simdbloom.Add(integer_testingvalues[i]);
 
 
 }
@@ -186,6 +189,24 @@ std::cout << "it took " << diff.count() << " s " << "for the Bloom Filter " <<st
 std::cout << "Its false positive rate is " << (double)fp / (un_sur_tx_pos*n) << std::endl;
 std::cout <<"It uses "<< parameters.optimal_parameters.number_of_hashes << " hash functions "<< std::endl;
 std::cout << "Bloom filter size : " << parameters.optimal_parameters.table_size << std::endl;
+
+//              SIMD BLOCK BLOOM FILTER 
+
+t1 = std::chrono::system_clock::now();
+fp = 0;
+for (unsigned int i = 0; i<(un_sur_tx_pos) * n; i++) {
+	srand(i);
+    //std::cout<<
+	simdbloom.Find(integer_testingvalues[i]);//<<std::endl;
+	if  (i>n && simdbloom.Find(integer_testingvalues[i]))  { fp++;  }
+		//<<std::endl ;
+}
+ t2 = std::chrono::system_clock::now();
+ diff = t2 - t1;
+std::cout<<std::endl << "it took " << diff.count() << " s " << "for the SIMD Bloom Filter " <<std::endl;
+std::cout << "Its false positive rate is " << (double)fp / (un_sur_tx_pos*n) << std::endl;
+std::cout <<"SIMB Block Bloom filter size : "<<simdbloom.SizeInBytes()*8<<std::endl;
+
 
 
 }

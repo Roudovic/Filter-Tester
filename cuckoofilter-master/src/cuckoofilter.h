@@ -91,9 +91,7 @@ class CuckooFilter {
     size_t num_buckets = upperpower2(std::max<uint64_t>(1, max_num_keys / assoc));
     double frac = (double)max_num_keys / num_buckets / assoc;
     if (frac > 0.96) {
-        //MODIFIED BY ME
-      num_buckets <<= 1;  //This is the original
-      //  num_buckets += 100;
+      num_buckets <<= 1;
     }
     victim_.used = false;
     table_ = new TableType<bits_per_item>(num_buckets);
