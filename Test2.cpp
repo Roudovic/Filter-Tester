@@ -1,7 +1,7 @@
 #include "Test2.h"
 #include <cstdint>
 #include <iostream>
-#include "BloomFilter_1.h"
+
 #include "BloomFilter.h"
 #define _CRT_SECURE_NO_WARNINGS
 #include <string.h>
@@ -75,7 +75,7 @@ double temps_moyens[5];
 
 std::size_t l = size_input;
 
-BloomFilter_1 bloom = BloomFilter_1(m,k);
+//BloomFilter_1 bloom = BloomFilter_1(m,k);
 BloomFilter Sbloom = BloomFilter(m, k); 
 
 //Cuckoo filter
@@ -109,7 +109,7 @@ for(unsigned int i = 0; i<n; i++){
     srand(i);
     integer_testingvalues[i]=rand();
 
-    bloom.add((const uint8_t*)s, l);
+    //bloom.add((const uint8_t*)s, l);
 	Sbloom.add((const uint8_t*)s, l);
     
     filter.Add(integer_testingvalues[i]);
@@ -128,6 +128,7 @@ for (unsigned int i=n; i<(un_sur_tx_pos)*n; i++){
 
 std::chrono::time_point<std::chrono::system_clock> t1 = std::chrono::system_clock::now();
 int fp = 0;
+    /*
 for(unsigned int i = 0; i<(un_sur_tx_pos)*n; i++){
    // std::cout<<
 	bloom.possiblyContains((const uint8_t*)testingvalues[i], strlen(testingvalues[i]));
@@ -137,6 +138,7 @@ for(unsigned int i = 0; i<(un_sur_tx_pos)*n; i++){
 	
     //<<std::endl ;
 }
+     */
  std::chrono::time_point<std::chrono::system_clock> t2 = std::chrono::system_clock::now();
  std::chrono::duration<double> diff = t2-t1;
 // std::cout<<"it took "<<diff.count()<<" s "<<"for the Bloom-1 "<<std::endl;
