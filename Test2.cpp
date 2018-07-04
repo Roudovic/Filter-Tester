@@ -56,9 +56,9 @@ int main(){
 const uint16_t size_input = 40;
 const uint16_t max_size_input = 100;
 
-const uint32_t n = 150;
-const uint32_t un_sur_tx_pos = 300;
-
+const uint32_t n = 450;
+const uint32_t un_sur_tx_pos = 100;
+const int nb_tests = 10;
 
 
 uint64_t m = floor(-1.44*n*log2(FP));
@@ -71,11 +71,12 @@ std::cout<< "filter size is : " <<m<<std::endl;
 char s[max_size_input] = " ";
 char testingvalues[(un_sur_tx_pos)*n][max_size_input];
 int integer_testingvalues[(un_sur_tx_pos)*n];
+double temps_moyens[5];
 
 std::size_t l = size_input;
 
 BloomFilter_1 bloom = BloomFilter_1(m,k);
-BloomFilter Sbloom = BloomFilter(m, k);
+BloomFilter Sbloom = BloomFilter(m, k); 
 
 //Cuckoo filter
 const uint8_t fingerprint_size = floor(log2(8/FP));
@@ -97,7 +98,8 @@ bloom_filter newbloom(parameters);
 
 SimdBlockFilter<> simdbloom(ceil(log2( 2*n * 8.0 / CHAR_BIT)));
 
-
+int tours = 0;
+while(tours < nb_tests){
 
 for(unsigned int i = 0; i<n; i++){
     
@@ -116,7 +118,7 @@ for(unsigned int i = 0; i<n; i++){
 
 
 }
-std::cout<< "Filters are done" << std::endl;
+// std::cout<< "Filters are done" << std::endl;
 for (unsigned int i=n; i<(un_sur_tx_pos)*n; i++){
     gen_random(s,size_input);
     strcpy(testingvalues[i],s );
@@ -135,10 +137,11 @@ for(unsigned int i = 0; i<(un_sur_tx_pos)*n; i++){
 	
     //<<std::endl ;
 }
-std::chrono::time_point<std::chrono::system_clock> t2 = std::chrono::system_clock::now();
-std::chrono::duration<double> diff = t2-t1;
-std::cout<<"it took "<<diff.count()<<" s "<<"for the Bloom-1 "<<std::endl;
-std::cout << "Its false positive rate is " << (double)fp / (un_sur_tx_pos* n) << std::endl;
+ std::chrono::time_point<std::chrono::system_clock> t2 = std::chrono::system_clock::now();
+ std::chrono::duration<double> diff = t2-t1;
+// std::cout<<"it took "<<diff.count()<<" s "<<"for the Bloom-1 "<<std::endl;
+// std::cout << "Its false positive rate is " << (double)fp / (un_sur_tx_pos* n) << std::endl;
+temps_moyens[0]+=diff.count();
 
 t1 = std::chrono::system_clock::now();
 fp = 0;
@@ -150,11 +153,11 @@ for (unsigned int i = 0; i<(un_sur_tx_pos) * n; i++) {
 }
  t2 = std::chrono::system_clock::now();
  diff = t2 - t1;
-std::cout << "it took " << diff.count() << " s " << "for the Bloom Filter " <<std::endl;
-std::cout << "Its false positive rate is " << (double)fp /(un_sur_tx_pos* n) << std::endl;
+// std::cout << "it took " << diff.count() << " s " << "for the Bloom Filter " <<std::endl;
+// std::cout << "Its false positive rate is " << (double)fp /(un_sur_tx_pos* n) << std::endl;
+temps_moyens[1]+=diff.count();
 
-
-std::cout<<std::endl<<"Entries are integers"<<std::endl;
+// std::cout<<std::endl<<"Entries are integers"<<std::endl;
 
 t1 = std::chrono::system_clock::now();
 fp = 0;
@@ -168,11 +171,12 @@ for (unsigned int i = 0; i<(un_sur_tx_pos) * n; i++) {
 }
  t2 = std::chrono::system_clock::now();
  diff = t2 - t1;
-std::cout << "it took " << diff.count() << " s " << "for the Cuckoo Filter " <<std::endl;
-std::cout << "Its false positive rate is " << (double)fp / (un_sur_tx_pos*n) << std::endl;
-std::cout<<"Cuckoo Filter Size : " << filter.SizeInBytes()*8<<std::endl;
-std::cout << "Fingerprint size : "<< floor(log2(8/FP)) << std::endl;
-std::cout<<filter.Info()<<std::endl;
+// std::cout << "it took " << diff.count() << " s " << "for the Cuckoo Filter " <<std::endl;
+// std::cout << "Its false positive rate is " << (double)fp / (un_sur_tx_pos*n) << std::endl;
+// std::cout<<"Cuckoo Filter Size : " << filter.SizeInBytes()*8<<std::endl;
+// std::cout << "Fingerprint size : "<< floor(log2(8/FP)) << std::endl;
+// std::cout<<filter.Info()<<std::endl;
+temps_moyens[2]+=diff.count();
 
 t1 = std::chrono::system_clock::now();
 fp = 0;
@@ -185,11 +189,11 @@ for (unsigned int i = 0; i<(un_sur_tx_pos) * n; i++) {
 }
  t2 = std::chrono::system_clock::now();
  diff = t2 - t1;
-std::cout << "it took " << diff.count() << " s " << "for the Bloom Filter " <<std::endl;
-std::cout << "Its false positive rate is " << (double)fp / (un_sur_tx_pos*n) << std::endl;
-std::cout <<"It uses "<< parameters.optimal_parameters.number_of_hashes << " hash functions "<< std::endl;
-std::cout << "Bloom filter size : " << parameters.optimal_parameters.table_size << std::endl;
-
+// std::cout << "it took " << diff.count() << " s " << "for the Bloom Filter " <<std::endl;
+//std::cout << "Its false positive rate is " << (double)fp / (un_sur_tx_pos*n) << std::endl;
+// std::cout <<"It uses "<< parameters.optimal_parameters.number_of_hashes << " hash functions "<< std::endl;
+// std::cout << "Bloom filter size : " << parameters.optimal_parameters.table_size << std::endl;
+temps_moyens[3]+=diff.count();
 //              SIMD BLOCK BLOOM FILTER 
 
 t1 = std::chrono::system_clock::now();
@@ -203,9 +207,20 @@ for (unsigned int i = 0; i<(un_sur_tx_pos) * n; i++) {
 }
  t2 = std::chrono::system_clock::now();
  diff = t2 - t1;
-std::cout<<std::endl << "it took " << diff.count() << " s " << "for the SIMD Bloom Filter " <<std::endl;
-std::cout << "Its false positive rate is " << (double)fp / (un_sur_tx_pos*n) << std::endl;
-std::cout <<"SIMB Block Bloom filter size : "<<simdbloom.SizeInBytes()*8<<std::endl;
+// std::cout<<std::endl << "it took " << diff.count() << " s " << "for the SIMD Bloom Filter " <<std::endl;
+//std::cout << "Its false positive rate is " << (double)fp / (un_sur_tx_pos*n) << std::endl;
+// std::cout <<"SIMD Block Bloom filter size : "<<simdbloom.SizeInBytes()*8<<std::endl;
+temps_moyens[4]+=diff.count();
+tours++;
+}
+for(int i =0; i<5; i++){
+    temps_moyens[i]=temps_moyens[i]/nb_tests;
+    std::cout << temps_moyens[i]<<std::endl;
+}
+std::cout << "Bloom filter size : " << parameters.optimal_parameters.table_size << std::endl;
+
+
+std::cout <<"SIMD Block Bloom filter size : "<<simdbloom.SizeInBytes()*8<<std::endl;
 
 
 
