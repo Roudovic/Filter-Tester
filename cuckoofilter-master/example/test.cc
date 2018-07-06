@@ -18,7 +18,7 @@ int main(int argc, char **argv) {
   // PackedTable, accepting keys of size_t type and making 13 bits
   // for each key:
   //   CuckooFilter<size_t, 13, cuckoofilter::PackedTable> filter(total_items);
-  CuckooFilter<size_t, 4> filter(total_items);
+  CuckooFilter<size_t, 12> filter(total_items);
 
   // Insert items to this cuckoo filter
   size_t num_inserted = 0;
