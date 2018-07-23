@@ -7,9 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		3247968820EF5BE100FDEC83 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3247968720EF5BE100FDEC83 /* main.cpp */; };
-		3247969020EF5C6500FDEC83 /* MortonFilter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3247968E20EF5C6500FDEC83 /* MortonFilter.cpp */; };
 		3247969320EF5CAA00FDEC83 /* MurmurHash3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3247969120EF5CAA00FDEC83 /* MurmurHash3.cpp */; };
+		3247969B20F4B7A900FDEC83 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3247968720EF5BE100FDEC83 /* main.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -27,10 +26,10 @@
 /* Begin PBXFileReference section */
 		3247968420EF5BE100FDEC83 /* MortonFilter */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = MortonFilter; sourceTree = BUILT_PRODUCTS_DIR; };
 		3247968720EF5BE100FDEC83 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
-		3247968E20EF5C6500FDEC83 /* MortonFilter.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MortonFilter.cpp; sourceTree = "<group>"; };
 		3247968F20EF5C6500FDEC83 /* MortonFilter.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MortonFilter.hpp; sourceTree = "<group>"; };
 		3247969120EF5CAA00FDEC83 /* MurmurHash3.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MurmurHash3.cpp; path = ../../MurmurHash3.cpp; sourceTree = "<group>"; };
 		3247969220EF5CAA00FDEC83 /* MurmurHash3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MurmurHash3.h; path = ../../MurmurHash3.h; sourceTree = "<group>"; };
+		3247969920F4B64900FDEC83 /* evp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = evp.h; path = ../../../../../usr/local/Cellar/openssl/1.0.2o_2/include/openssl/evp.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -49,6 +48,7 @@
 			children = (
 				3247968620EF5BE100FDEC83 /* MortonFilter */,
 				3247968520EF5BE100FDEC83 /* Products */,
+				3247969820F4B64800FDEC83 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -66,10 +66,17 @@
 				3247969120EF5CAA00FDEC83 /* MurmurHash3.cpp */,
 				3247969220EF5CAA00FDEC83 /* MurmurHash3.h */,
 				3247968720EF5BE100FDEC83 /* main.cpp */,
-				3247968E20EF5C6500FDEC83 /* MortonFilter.cpp */,
 				3247968F20EF5C6500FDEC83 /* MortonFilter.hpp */,
 			);
 			path = MortonFilter;
+			sourceTree = "<group>";
+		};
+		3247969820F4B64800FDEC83 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				3247969920F4B64900FDEC83 /* evp.h */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -128,9 +135,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3247969020EF5C6500FDEC83 /* MortonFilter.cpp in Sources */,
+				3247969B20F4B7A900FDEC83 /* main.cpp in Sources */,
 				3247969320EF5CAA00FDEC83 /* MurmurHash3.cpp in Sources */,
-				3247968820EF5BE100FDEC83 /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -188,6 +194,8 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "";
+				LIBRARY_SEARCH_PATHS = "";
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -240,6 +248,8 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "";
+				LIBRARY_SEARCH_PATHS = "";
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;

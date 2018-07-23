@@ -12,7 +12,7 @@ SRC = ../src/hashutil.cc
 
 .PHONY: all
 
-BINS = conext-table3.exe conext-figure5.exe bulk-insert-and-query.exe
+BINS =  bulk-insert-and-query.exe
 
 all: $(BINS)
 
