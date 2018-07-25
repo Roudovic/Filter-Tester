@@ -15,6 +15,7 @@
 #include <cstdint>
 #include <cstdlib>
 
+
 #include <algorithm>
 #include <new>
 
@@ -81,9 +82,9 @@ SimdBlockFilter<HashFamily>::SimdBlockFilter(const int log_heap_space)
     directory_mask_((1ull << ::std::min(63, log_num_buckets_)) - 1),
     directory_(nullptr),
     hasher_() {
-  if (!__builtin_cpu_supports("avx2")) {
-    throw ::std::runtime_error("SimdBlockFilter does not work without AVX2 instructions");
-  }
+//  if (!__builtin_cpu_supports("avx2")) {
+//    throw ::std::runtime_error("SimdBlockFilter does not work without AVX2 instructions");
+//  }
   const size_t alloc_size = 1ull << (log_num_buckets_ + LOG_BUCKET_BYTE_SIZE);
   const int malloc_failed =
       posix_memalign(reinterpret_cast<void**>(&directory_), 64, alloc_size);
@@ -116,14 +117,45 @@ SimdBlockFilter<HashFamily>::MakeMask(const uint32_t hash) noexcept {
   return _mm256_sllv_epi32(ones, hash_data);
 }
 
+////For tesdting
+//bool handle_avx2 = false;
+
+
+
 template <typename HashFamily>
 [[gnu::always_inline]] inline void
 SimdBlockFilter<HashFamily>::Add(const uint64_t key) noexcept {
   const auto hash = hasher_(key);
   const uint32_t bucket_idx = hash & directory_mask_;
+    if(!__builtin_cpu_supports("avx2")){
+        uint32_t mask[8];
+//        uint32_t ones[8] = {1,1,1,1,1,1,1,1};
+        uint32_t rehash[8] = {0x47b6137bU, 0x44974d91U, 0x8824ad5bU,
+            0xa2b7289dU, 0x705495c7U, 0x2df1424bU, 0x9efc4947U, 0x5c6bfb31U};
+        auto hash2 = hash>>log_num_buckets_;
+        
+        uint64_t hash_data[8] = {hash2,hash2,hash2,hash2,hash2,hash2,hash2,hash2};
+        uint32_t hash_data_32[8];
+        for(int i = 0; i<8; i++){
+            hash_data[i]=hash_data[i]*rehash[i];
+            hash_data_32[i]=hash_data[i];
+            hash_data[i]>>=27;
+            mask[i]=1<<hash_data[i];
+            directory_[bucket_idx][i] |= mask[i];
+//            Debug purposes
+            
+//            debug purposes
+        }
+        
+    }
+    else{
+
   const __m256i mask = MakeMask(hash >> log_num_buckets_);
   __m256i* const bucket = &reinterpret_cast<__m256i*>(directory_)[bucket_idx];
   _mm256_store_si256(bucket, _mm256_or_si256(*bucket, mask));
+        
+    }
+    
 }
 
 template <typename HashFamily>

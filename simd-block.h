@@ -20,7 +20,7 @@
 #include <new>
 
 #include <immintrin.h>
-
+#include <iostream>
 #include "hashutil.h"
 
 using uint32_t = ::std::uint32_t;
@@ -126,6 +126,7 @@ template <typename HashFamily>
 [[gnu::always_inline]] inline void
 SimdBlockFilter<HashFamily>::Add(const uint64_t key) noexcept {
   const auto hash = hasher_(key);
+    std::cout << hash << std::endl;
   const uint32_t bucket_idx = hash & directory_mask_;
     if(!__builtin_cpu_supports("avx2")){
         uint32_t mask[8];
@@ -162,6 +163,7 @@ template <typename HashFamily>
 [[gnu::always_inline]] inline bool
 SimdBlockFilter<HashFamily>::Find(const uint64_t key) const noexcept {
   const auto hash = hasher_(key);
+    std::cout << hash << std::endl;
   const uint32_t bucket_idx = hash & directory_mask_;
   const __m256i mask = MakeMask(hash >> log_num_buckets_);
   const __m256i bucket = reinterpret_cast<__m256i*>(directory_)[bucket_idx];

@@ -54,9 +54,8 @@ void gen_random(char *s, const int len) {
 const uint32_t size_input = 40;
 const uint32_t max_size_input = 100;
 
-
-const uint32_t n = 500;
-const uint32_t un_sur_tx_pos = 100;
+const uint32_t n = 100;
+const uint32_t un_sur_tx_pos = 1;
 const int nb_tests = 10;
 
 int second_buckets_items[n];
@@ -144,6 +143,7 @@ int main(){
             
             
         }
+         std::cout<< "" << std::endl;
         
         std::chrono::time_point<std::chrono::system_clock> t1 = std::chrono::system_clock::now();
         int fp = 0;
@@ -251,16 +251,20 @@ int main(){
         //    MORTON FILTER
         
         
-        bool containMorton;
+        bool containMorton=false;
         int size_list = 0;
         int *size_list_ptr = &size_list;
         t1 = std::chrono::system_clock::now();
         fp = 0;
+        
+
         for (uint64_t i = 0; i<(un_sur_tx_pos) * n; i++) {
              containMorton = mrtn.Contains1(&integer_testingvalues[i],sizeof(int),second_buckets_items, size_list_ptr);//
              if(i>=n && containMorton ) { fp++;  }
         }
 //        std::cout<<size_list<<std::endl;
+
+        containMorton=false;
         for (uint64_t i = 0; i<(un_sur_tx_pos) * n; i++) {
            containMorton = mrtn.ContainsElse(second_buckets_items+i,sizeof(int));
             if  (i>=n && containMorton ) { fp++;  }

@@ -1,7 +1,7 @@
-#include "Test3.h"
+#include "Test3.hpp"
 #include <cstdint>
 #include <iostream>
-#include "BloomFilter_1.h"
+
 #include "BloomFilter.h"
 #define _CRT_SECURE_NO_WARNINGS
 #include <string.h>
@@ -13,8 +13,7 @@
 #include "bloom_filter.hpp"
 #include <fstream>
 
-#include "cuckoofilter.h"
-#include "simd-block.h"
+
 
 
 
@@ -26,15 +25,6 @@
 
 
 
-Test3::Test3()
-{
-    //ctor
-}
-
-Test3::~Test3()
-{
-    //dtor
-}
 
 
 void gen_random(char *s, const int len) {
@@ -84,9 +74,7 @@ int main(){
         //BloomFilter_1 bloom = BloomFilter_1(m,k);
         BloomFilter Sbloom = BloomFilter(m, k);
         
-        //Cuckoo filter
-        const uint8_t fingerprint_size = floor(log2(8/FP));
-        cuckoofilter::CuckooFilter<int,16> filter(n);
+       
         
         
         //Other Bloom Filter implementation with optimally chosen parameters
@@ -100,11 +88,6 @@ int main(){
         parameters.compute_optimal_parameters();
         bloom_filter newbloom(parameters);
         
-        // SIMD Based Blocked Bloom Filter -- Close to the Ultra-fast Bloom filter implementation
-        
-        //SimdBlockFilter<> simdbloom(ceil(log2( 3*n * 8.0 / CHAR_BIT)));
-        
-        SimdBlockFilter<> simdbloom(20);
         
         for(unsigned int i = 0; i<n; i++){
             
@@ -114,12 +97,12 @@ int main(){
             srand(i);
             integer_testingvalues[i]=rand();
             
-            //bloom.add((const uint8_t*)s, l);
+            
             Sbloom.add((const uint8_t*)s, l);
             
-            filter.Add(integer_testingvalues[i]);
+            
             newbloom.insert(integer_testingvalues[i]);
-            simdbloom.Add(integer_testingvalues[i]);
+            
             
             
         }
@@ -153,6 +136,9 @@ int main(){
         temps_moyens[0]+=diff.count();
         fp_means[0]+=(double)fp / (un_sur_tx_pos* n);
         
+        
+        
+        
         t1 = std::chrono::system_clock::now();
         fp = 0;
         for (unsigned int i = 0; i<(un_sur_tx_pos) * n; i++) {
@@ -167,30 +153,9 @@ int main(){
         // std::cout << "Its false positive rate is " << (double)fp /(un_sur_tx_pos* n) << std::endl;
         temps_moyens[1]+=diff.count();
         fp_means[1]+=(double)fp / (un_sur_tx_pos* n);
+
         
-        // std::cout<<std::endl<<"Entries are integers"<<std::endl;
-        
-        t1 = std::chrono::system_clock::now();
-        fp = 0;
-        for (unsigned int i = 0; i<(un_sur_tx_pos) * n; i++) {
-            srand(i);
-            //std::cout<<
-            
-            filter.Contain(integer_testingvalues[i]);//<<std::endl;
-            if (i>n && filter.Contain(integer_testingvalues[i])==0)  { fp++;  }
-            //<<std::endl ;
-        }
-        t2 = std::chrono::system_clock::now();
-        diff = t2 - t1;
-        // std::cout << "it took " << diff.count() << " s " << "for the Cuckoo Filter " <<std::endl;
-        if(tours ==1) {std::cout << "Cuckoo false positive rate is " << (double)fp / (un_sur_tx_pos*n) << std::endl;
-            std::cout<<"Cuckoo Filter Size : " << filter.SizeInBytes()*8<<std::endl;
-            filter_sizes[2]=filter.SizeInBytes()*8;
-        }
-        // std::cout << "Fingerprint size : "<< floor(log2(8/FP)) << std::endl;
-        if(tours ==1) std::cout<<filter.Info()<<std::endl;
-        temps_moyens[2]+=diff.count();
-        fp_means[2]+=(double)fp / (un_sur_tx_pos* n);
+//        Bloom filter
         
         t1 = std::chrono::system_clock::now();
         fp = 0;
@@ -214,27 +179,7 @@ int main(){
         temps_moyens[3]+=diff.count();
         fp_means[3]+=(double)fp / (un_sur_tx_pos* n);
         
-        
-        //              SIMD BLOCK BLOOM FILTER
-        
-        t1 = std::chrono::system_clock::now();
-        fp = 0;
-        for (unsigned int i = 0; i<(un_sur_tx_pos) * n; i++) {
-            
-            //std::cout<<
-            simdbloom.Find(integer_testingvalues[i]);//<<std::endl;
-            if  (i>n && simdbloom.Find(integer_testingvalues[i]))  { fp++;  }
-            //<<std::endl ;
-        }
-        t2 = std::chrono::system_clock::now();
-        diff = t2 - t1;
-        // std::cout<<std::endl << "it took " << diff.count() << " s " << "for the SIMD Bloom Filter " <<std::endl;
-        if(tours ==1){std::cout << "SIMD false positive rate is " << (double)fp / (un_sur_tx_pos*n) << std::endl;
-            std::cout <<"SIMD Block Bloom filter size : "<<simdbloom.SizeInBytes()*8<<std::endl;
-            filter_sizes[4]=simdbloom.SizeInBytes()*8;
-        }
-        temps_moyens[4]+=diff.count();
-        fp_means[4]+=(double)fp / (un_sur_tx_pos* n);
+ 
         tours++;
     }
     for(int i =2; i<5; i++){

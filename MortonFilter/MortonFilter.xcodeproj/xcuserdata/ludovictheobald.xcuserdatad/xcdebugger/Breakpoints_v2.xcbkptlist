@@ -10,11 +10,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "MortonFilter/main.cpp"
-            timestampString = "553515233.436559"
+            timestampString = "554185603.706755"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "62"
-            endingLineNumber = "62"
+            startingLineNumber = "68"
+            endingLineNumber = "68"
             landmarkName = "main(int argc, const char * argv[])"
             landmarkType = "9">
          </BreakpointContent>
@@ -23,63 +23,47 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             shouldBeEnabled = "No"
-            ignoreCount = "6746"
+            ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "MortonFilter/MortonFilter.hpp"
-            timestampString = "553515233.436628"
+            timestampString = "554185603.70707"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "144"
-            endingLineNumber = "144"
-            landmarkName = "MortonFilter::find_fsa_slot_noffset(MortonFilter::Block *block, uint8_t lbi)"
+            startingLineNumber = "69"
+            endingLineNumber = "69"
+            landmarkName = "MortonFilter(int nb_items_expected)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            shouldBeEnabled = "No"
+            shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "MortonFilter/MortonFilter.hpp"
-            timestampString = "553515233.436913"
+            timestampString = "554185603.707303"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "284"
-            endingLineNumber = "284"
-            landmarkName = "MortonFilter::Contains1(void* __restrict data, int len, int* second_bucket_items, int *size_list)"
+            startingLineNumber = "244"
+            endingLineNumber = "244"
+            landmarkName = "MortonFilter::res_conflict(Block* filter, Block* block1, Block* block2, uint32_t glbi1, uint32_t glbi2, uint8_t hf, uint64_t murhash )"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            shouldBeEnabled = "No"
+            shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "MortonFilter/MortonFilter.hpp"
-            timestampString = "553515233.437135"
+            timestampString = "554185603.70737"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "283"
-            endingLineNumber = "283"
-            landmarkName = "MortonFilter::Contains1(void* __restrict data, int len, int* second_bucket_items, int *size_list)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "MortonFilter/MortonFilter.hpp"
-            timestampString = "553515233.437351"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "295"
-            endingLineNumber = "295"
-            landmarkName = "MortonFilter::Contains1(void* __restrict data, int len, int* second_bucket_items, int *size_list)"
+            startingLineNumber = "253"
+            endingLineNumber = "253"
+            landmarkName = "MortonFilter::res_conflict(Block* filter, Block* block1, Block* block2, uint32_t glbi1, uint32_t glbi2, uint8_t hf, uint64_t murhash )"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

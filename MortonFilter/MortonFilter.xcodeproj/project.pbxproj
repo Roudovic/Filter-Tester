@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		3247969320EF5CAA00FDEC83 /* MurmurHash3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3247969120EF5CAA00FDEC83 /* MurmurHash3.cpp */; };
 		3247969B20F4B7A900FDEC83 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3247968720EF5BE100FDEC83 /* main.cpp */; };
+		32F162172105BD9F001F0BB3 /* clhash.c in Sources */ = {isa = PBXBuildFile; fileRef = 32F162162105BD9F001F0BB3 /* clhash.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -30,6 +31,9 @@
 		3247969120EF5CAA00FDEC83 /* MurmurHash3.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MurmurHash3.cpp; path = ../../MurmurHash3.cpp; sourceTree = "<group>"; };
 		3247969220EF5CAA00FDEC83 /* MurmurHash3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MurmurHash3.h; path = ../../MurmurHash3.h; sourceTree = "<group>"; };
 		3247969920F4B64900FDEC83 /* evp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = evp.h; path = ../../../../../usr/local/Cellar/openssl/1.0.2o_2/include/openssl/evp.h; sourceTree = "<group>"; };
+		32C1A420210831E700215755 /* hashutil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = hashutil.h; path = "../../cuckoofilter-master/src/hashutil.h"; sourceTree = "<group>"; };
+		32F162152105BD9F001F0BB3 /* clhash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = clhash.h; sourceTree = "<group>"; };
+		32F162162105BD9F001F0BB3 /* clhash.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = clhash.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,6 +67,9 @@
 		3247968620EF5BE100FDEC83 /* MortonFilter */ = {
 			isa = PBXGroup;
 			children = (
+				32C1A420210831E700215755 /* hashutil.h */,
+				32F162162105BD9F001F0BB3 /* clhash.c */,
+				32F162152105BD9F001F0BB3 /* clhash.h */,
 				3247969120EF5CAA00FDEC83 /* MurmurHash3.cpp */,
 				3247969220EF5CAA00FDEC83 /* MurmurHash3.h */,
 				3247968720EF5BE100FDEC83 /* main.cpp */,
@@ -136,6 +143,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3247969B20F4B7A900FDEC83 /* main.cpp in Sources */,
+				32F162172105BD9F001F0BB3 /* clhash.c in Sources */,
 				3247969320EF5CAA00FDEC83 /* MurmurHash3.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -146,7 +154,7 @@
 		3247968920EF5BE100FDEC83 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
+				ALWAYS_SEARCH_USER_PATHS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -180,7 +188,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_C_LANGUAGE_STANDARD = c11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -194,7 +202,10 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = "";
+				HEADER_SEARCH_PATHS = (
+					/usr/local/Cellar/openssl/1.0.2o_2/lib,
+					/usr/local/Cellar/openssl/1.0.2o_2/include,
+				);
 				LIBRARY_SEARCH_PATHS = "";
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				MTL_ENABLE_DEBUG_INFO = YES;
@@ -206,7 +217,7 @@
 		3247968A20EF5BE100FDEC83 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
+				ALWAYS_SEARCH_USER_PATHS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -240,15 +251,19 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_C_LANGUAGE_STANDARD = c11;
 				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = "";
+				HEADER_SEARCH_PATHS = (
+					/usr/local/Cellar/openssl/1.0.2o_2/lib,
+					/usr/local/Cellar/openssl/1.0.2o_2/include,
+				);
 				LIBRARY_SEARCH_PATHS = "";
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				MTL_ENABLE_DEBUG_INFO = NO;
@@ -260,6 +275,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				OTHER_CFLAGS = (
+					"-msse4.2",
+					"-mpclmul",
+				);
+				OTHER_CPLUSPLUSFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -268,6 +288,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				OTHER_CFLAGS = (
+					"-msse4.2",
+					"-mpclmul",
+				);
+				OTHER_CPLUSPLUSFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;

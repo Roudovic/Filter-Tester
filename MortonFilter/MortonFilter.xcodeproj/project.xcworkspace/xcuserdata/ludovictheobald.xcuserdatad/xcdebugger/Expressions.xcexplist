@@ -11,7 +11,18 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "MortonFilter::Add(void*, int):MortonFilter.hpp">
+         contextName = "MortonFilter::res_conflict(MortonFilter::Block*, MortonFilter::Block*, MortonFilter::Block*, unsigned int, unsigned int, unsigned char, unsigned long long):MortonFilter.hpp">
+         <PersistentStrings>
+            <PersistentString
+               value = "filter[glbi1/64]">
+            </PersistentString>
+            <PersistentString
+               value = "offset(hf)">
+            </PersistentString>
+            <PersistentString
+               value = "offset(cuckooed_hf)">
+            </PersistentString>
+         </PersistentStrings>
       </ContextState>
    </ContextStates>
 </VariablesViewState>

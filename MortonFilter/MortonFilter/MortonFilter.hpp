@@ -14,10 +14,11 @@
 #include <stdio.h>
 #include <vector>
 #include "MurmurHash3.h"
+#include "hashutil.h"
 
 #endif /* MortonFilter_hpp */
 #define LEN 10
-#define OFF_RANGE 4
+#define OFF_RANGE 128
 
 class MortonFilter{
     // Public here for tests purposes, TO CHANGE
@@ -35,6 +36,8 @@ class MortonFilter{
     
     Block *filter;
     
+    cuckoofilter::TwoIndependentMultiplyShift hasher;
+    
     int Add(void* __restrict data, int len);
     
     bool table_simple_store(Block *block, uint8_t lbi, uint8_t Fx);
@@ -51,10 +54,11 @@ class MortonFilter{
     
     bool OTA_bit_is_unset(Block *block, uint8_t lbi, uint64_t murhash);
     
-    int res_conflict(Block* filter, Block* block1, Block* block2, uint8_t lbi1, uint8_t lbi2, uint8_t hf );
+    int res_conflict(Block* filter, Block* block1, Block* block2, uint32_t glbi1, uint32_t glbi2, uint8_t hf, uint64_t murhash );
     
     
     uint16_t find_fsa_slot(Block* block, uint8_t lbi );
+    
     uint16_t find_fsa_slot_noffset(Block *block, uint8_t lbi);
     
     int SizeInBytes();
@@ -63,7 +67,7 @@ class MortonFilter{
     // like block.getFCAindex(i)
     
     explicit MortonFilter(int nb_items_expected) {
-        nb_blocks = (1.5*(nb_items_expected) / 46) + 2 ;
+        nb_blocks = (1.3 * nb_items_expected / 46) + 2 ;
         size_t size_block = sizeof(struct Block);
         //filter = (Block*)malloc(size_block * nb_blocks);
         filter = new Block[nb_blocks];
@@ -87,7 +91,7 @@ inline uint32_t map2(int x, uint32_t n){
 }
 
 inline uint8_t offset(uint8_t Fx){
-    return  (64 + (Fx % OFF_RANGE)) | 1;
+    return  (64 + (Fx & (OFF_RANGE-1))) | 1;
 }
 
 inline uint16_t MortonFilter::find_fsa_slot(MortonFilter::Block *block, uint8_t lbi){
@@ -201,6 +205,7 @@ inline int MortonFilter::Add(void* __restrict data, int len){
     int nb_buckets = 46 * nb_blocks;
     uint32_t glbi1 = map(murhash0, nb_buckets);
     uint32_t glbi2;
+    Block *block2;
     //    printf("MurmurHash Value : %llx \n", murhash0);
     //    printf("Global block index : %x \n", glbi1 );
     
@@ -217,30 +222,53 @@ inline int MortonFilter::Add(void* __restrict data, int len){
         //        std::cout << "Hash 2 is used "<< std::endl;
         set_OTA(block1, lbi1, murhash0);
         glbi2 = map2(glbi1 + (1-((glbi1 & 1)<<1))*offset(hf), nb_buckets);
-        Block *block2 = &filter[glbi2/64];
+        block2 = &filter[glbi2/64];
         uint8_t lbi2 = glbi2 % 64;
         if (table_simple_store(block2, lbi2, hf)){
             return 2;
         }
     }
-    // For now, ignore the conflicts
-    //return res_conflict(filter, block1, block2, lbi1, lbi2, hf);
-    //    std::cout << "Conflit non pris en compte " << std::endl;
     
     return 0;
+    
+    return res_conflict(filter, block1, block2, glbi1, glbi2, hf, murhash0);
+    
+    
+    
     
     
 }
 
-int MortonFilter::res_conflict(Block* filter, Block* block1, Block* block2, uint32_t glbi1, uint32_t glbi2, uint8_t hf ){
-    if(bucket1_full){
-        cuckooed_slot = find_fsa_slot(block1, lbi1);
-        cuckooed_hf = block1->FSA[find_fsa_slot(block1, lbi1)];
-        block1->FSA[find_fsa_slot(block1, lbi1)]=hf;
-        uint64_t glbi3 = map2(glbi1 + (1-((glbi1 & 1)<<1))*offset(hf), 46*nb_blocks);
-        
-        
+int MortonFilter::res_conflict(Block* filter, Block* block1, Block* block2, uint32_t glbi1, uint32_t glbi2, uint8_t hf, uint64_t murhash ){
+    
+    
+    
+    uint8_t lbi1 = glbi1%64;
+    uint8_t lbi2 = glbi2%64;
+    
+    
+    uint8_t cuckooed_hf = block1->FSA[find_fsa_slot_noffset(block1, lbi1)];
+    uint8_t cuckooed_hf2 = block2->FSA[find_fsa_slot_noffset(block2, lbi2)];
+    
+    uint32_t glbi3 = map2(glbi1 + (1-((glbi1 & 1)<<1))*offset(cuckooed_hf), 46*nb_blocks);
+    uint8_t lbi3 = glbi3%64;
+    Block *block3 = &filter[glbi3/64];
+    
+    uint32_t glbi4 = map2(glbi2 + (1-((glbi2 & 1)<<1))*offset(cuckooed_hf2), 46*nb_blocks);
+    uint8_t lbi4 = glbi4%64;
+    Block *block4 = &filter[glbi4/64];
+    
+    block1->FSA[find_fsa_slot_noffset(block1, lbi1)]=hf;
+    set_OTA(block1, lbi1, murhash);
+    
+    if(table_simple_store(block3, lbi3, cuckooed_hf)){
+        return 1;
+    }else{
+        return res_conflict(filter, block3, block2, glbi3, glbi2, cuckooed_hf, murhash);
     }
+    
+    return 0;
+    
 }
 
 
@@ -283,7 +311,7 @@ bool MortonFilter::Contains(void* __restrict data, int len){
         return match;
     }
     else{
-        uint32_t glbi2 = map2(glbi1 + (1-((murhash0 & 1)<<1))*offset(hf), nb_buckets);  // nb_buckets HAS to be > 64+OFF_RANGE+1
+        uint32_t glbi2 = map2(glbi1 + (1-((glbi1 & 1)<<1))*offset(hf), nb_buckets);  // nb_buckets HAS to be > 64+OFF_RANGE+1
         Block *block2 = &filter[glbi2/64];
         uint8_t lbi2 = glbi2 % 64;
         return table_read_and_cmp(block2, lbi2, hf);
@@ -319,7 +347,7 @@ inline bool MortonFilter::ContainsElse(void* __restrict data, int len){
     int nb_buckets = 46 * nb_blocks;
     uint32_t glbi1 = map(murhash0, nb_buckets);
     uint8_t hf = ((&murhash0)[1]>>56);
-    uint32_t glbi2 = map2(glbi1 + (1-((murhash0 & 1)<<1))*offset(hf), nb_buckets);  // nb_buckets HAS to be > 64+OFF_RANGE+1
+    uint32_t glbi2 = map2(glbi1 + (1-((glbi1 & 1)<<1))*offset(hf), nb_buckets);  // nb_buckets HAS to be > 64+OFF_RANGE+1
     Block *block2 = &filter[glbi2/64];
     uint8_t lbi2 = glbi2 % 64;
     return table_read_and_cmp(block2, lbi2, hf);
