@@ -22,6 +22,8 @@
 #include <immintrin.h>
 
 #include "hashutil.h"
+//#include "../../MurmurHash3.cpp"
+#include "../../cityhash-master/src/city.h"
 
 using uint32_t = ::std::uint32_t;
 using uint64_t = ::std::uint64_t;
@@ -82,9 +84,9 @@ SimdBlockFilter<HashFamily>::SimdBlockFilter(const int log_heap_space)
     directory_mask_((1ull << ::std::min(63, log_num_buckets_)) - 1),
     directory_(nullptr),
     hasher_() {
-//  if (!__builtin_cpu_supports("avx2")) {
-//    throw ::std::runtime_error("SimdBlockFilter does not work without AVX2 instructions");
-//  }
+  if (!__builtin_cpu_supports("avx2")) {
+    throw ::std::runtime_error("SimdBlockFilter does not work without AVX2 instructions");
+  }
   const size_t alloc_size = 1ull << (log_num_buckets_ + LOG_BUCKET_BYTE_SIZE);
   const int malloc_failed =
       posix_memalign(reinterpret_cast<void**>(&directory_), 64, alloc_size);
@@ -125,7 +127,9 @@ SimdBlockFilter<HashFamily>::MakeMask(const uint32_t hash) noexcept {
 template <typename HashFamily>
 [[gnu::always_inline]] inline void
 SimdBlockFilter<HashFamily>::Add(const uint64_t key) noexcept {
-  const auto hash = hasher_(key);
+     uint64_t hash ;
+//    MurmurHash3_x64_128( &key, 4 , 0, &hash);
+    hash = CityHash64((char*)&key,4);
   const uint32_t bucket_idx = hash & directory_mask_;
     if(!__builtin_cpu_supports("avx2")){
         uint32_t mask[8];
@@ -161,7 +165,8 @@ SimdBlockFilter<HashFamily>::Add(const uint64_t key) noexcept {
 template <typename HashFamily>
 [[gnu::always_inline]] inline bool
 SimdBlockFilter<HashFamily>::Find(const uint64_t key) const noexcept {
-  const auto hash = hasher_(key);
+   uint64_t hash ;
+    hash = CityHash64((char*)&key,4);
   const uint32_t bucket_idx = hash & directory_mask_;
   const __m256i mask = MakeMask(hash >> log_num_buckets_);
   const __m256i bucket = reinterpret_cast<__m256i*>(directory_)[bucket_idx];

@@ -9,7 +9,10 @@
 /* Begin PBXBuildFile section */
 		3247969320EF5CAA00FDEC83 /* MurmurHash3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3247969120EF5CAA00FDEC83 /* MurmurHash3.cpp */; };
 		3247969B20F4B7A900FDEC83 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3247968720EF5BE100FDEC83 /* main.cpp */; };
-		32F162172105BD9F001F0BB3 /* clhash.c in Sources */ = {isa = PBXBuildFile; fileRef = 32F162162105BD9F001F0BB3 /* clhash.c */; };
+		329F80B421087F35007E1542 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 329F80B221087F35007E1542 /* libcrypto.a */; };
+		32D5CF922108758D00918029 /* hashutil.cc in Sources */ = {isa = PBXBuildFile; fileRef = 32D5CF912108758D00918029 /* hashutil.cc */; };
+		32E9C729211C183C00EA0737 /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32E9C728211C183C00EA0737 /* libssl.a */; };
+		32E9C72C211C1D9100EA0737 /* libcityhash.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32E9C72A211C194900EA0737 /* libcityhash.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -31,9 +34,13 @@
 		3247969120EF5CAA00FDEC83 /* MurmurHash3.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MurmurHash3.cpp; path = ../../MurmurHash3.cpp; sourceTree = "<group>"; };
 		3247969220EF5CAA00FDEC83 /* MurmurHash3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MurmurHash3.h; path = ../../MurmurHash3.h; sourceTree = "<group>"; };
 		3247969920F4B64900FDEC83 /* evp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = evp.h; path = ../../../../../usr/local/Cellar/openssl/1.0.2o_2/include/openssl/evp.h; sourceTree = "<group>"; };
+		329F80AD21087D05007E1542 /* openssl */ = {isa = PBXFileReference; lastKnownFileType = folder; name = openssl; path = ../../../../../usr/local/Cellar/openssl/1.0.2o_2/include/openssl; sourceTree = "<group>"; };
+		329F80AF21087D28007E1542 /* openssl */ = {isa = PBXFileReference; lastKnownFileType = folder; name = openssl; path = ../../../../../usr/local/Cellar/openssl; sourceTree = "<group>"; };
+		329F80B221087F35007E1542 /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcrypto.a; path = ../../../../../usr/local/Cellar/openssl/1.0.2o_2/lib/libcrypto.a; sourceTree = "<group>"; };
 		32C1A420210831E700215755 /* hashutil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = hashutil.h; path = "../../cuckoofilter-master/src/hashutil.h"; sourceTree = "<group>"; };
-		32F162152105BD9F001F0BB3 /* clhash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = clhash.h; sourceTree = "<group>"; };
-		32F162162105BD9F001F0BB3 /* clhash.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = clhash.c; sourceTree = "<group>"; };
+		32D5CF912108758D00918029 /* hashutil.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = hashutil.cc; path = "../../cuckoofilter-master/src/hashutil.cc"; sourceTree = "<group>"; };
+		32E9C728211C183C00EA0737 /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libssl.a; path = "../../../../../anaconda3/pkgs/openssl-1.0.2o-h26aff7b_0/lib/libssl.a"; sourceTree = "<group>"; };
+		32E9C72A211C194900EA0737 /* libcityhash.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcityhash.a; path = "../cityhash-master/src/.libs/libcityhash.a"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -41,6 +48,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				32E9C72C211C1D9100EA0737 /* libcityhash.a in Frameworks */,
+				32E9C729211C183C00EA0737 /* libssl.a in Frameworks */,
+				329F80B421087F35007E1542 /* libcrypto.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -67,9 +77,8 @@
 		3247968620EF5BE100FDEC83 /* MortonFilter */ = {
 			isa = PBXGroup;
 			children = (
+				32D5CF912108758D00918029 /* hashutil.cc */,
 				32C1A420210831E700215755 /* hashutil.h */,
-				32F162162105BD9F001F0BB3 /* clhash.c */,
-				32F162152105BD9F001F0BB3 /* clhash.h */,
 				3247969120EF5CAA00FDEC83 /* MurmurHash3.cpp */,
 				3247969220EF5CAA00FDEC83 /* MurmurHash3.h */,
 				3247968720EF5BE100FDEC83 /* main.cpp */,
@@ -81,6 +90,11 @@
 		3247969820F4B64800FDEC83 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				32E9C72A211C194900EA0737 /* libcityhash.a */,
+				32E9C728211C183C00EA0737 /* libssl.a */,
+				329F80B221087F35007E1542 /* libcrypto.a */,
+				329F80AD21087D05007E1542 /* openssl */,
+				329F80AF21087D28007E1542 /* openssl */,
 				3247969920F4B64900FDEC83 /* evp.h */,
 			);
 			name = Frameworks;
@@ -143,8 +157,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				3247969B20F4B7A900FDEC83 /* main.cpp in Sources */,
-				32F162172105BD9F001F0BB3 /* clhash.c in Sources */,
 				3247969320EF5CAA00FDEC83 /* MurmurHash3.cpp in Sources */,
+				32D5CF922108758D00918029 /* hashutil.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -154,7 +168,7 @@
 		3247968920EF5BE100FDEC83 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = YES;
+				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -202,11 +216,8 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = (
-					/usr/local/Cellar/openssl/1.0.2o_2/lib,
-					/usr/local/Cellar/openssl/1.0.2o_2/include,
-				);
-				LIBRARY_SEARCH_PATHS = "";
+				HEADER_SEARCH_PATHS = /usr/local/Cellar/openssl/1.0.2o_2/include;
+				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/../cityhash-master/src/.libs\"";
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -217,7 +228,7 @@
 		3247968A20EF5BE100FDEC83 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = YES;
+				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -260,11 +271,8 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = (
-					/usr/local/Cellar/openssl/1.0.2o_2/lib,
-					/usr/local/Cellar/openssl/1.0.2o_2/include,
-				);
-				LIBRARY_SEARCH_PATHS = "";
+				HEADER_SEARCH_PATHS = /usr/local/Cellar/openssl/1.0.2o_2/include;
+				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/../cityhash-master/src/.libs\"";
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
@@ -274,12 +282,21 @@
 		3247968C20EF5BE100FDEC83 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_USE_OPTIMIZATION_PROFILE = NO;
 				CODE_SIGN_STYLE = Automatic;
-				OTHER_CFLAGS = (
-					"-msse4.2",
-					"-mpclmul",
+				HEADER_SEARCH_PATHS = (
+					/usr/local/Cellar/openssl/1.0.2o_2/include,
+					"\"$(SRCROOT)/../cityhash-master/src\"",
 				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/usr/local/Cellar/openssl/1.0.2o_2/lib,
+					"\"$(SRCROOT)/../cityhash-master/src/.libs\"",
+				);
+				MACH_O_TYPE = mh_execute;
+				OTHER_CFLAGS = "";
 				OTHER_CPLUSPLUSFLAGS = "";
+				OTHER_LDFLAGS = "-L/usr/local/Cellar/openssl/1.0.2o_2/lib";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -287,12 +304,21 @@
 		3247968D20EF5BE100FDEC83 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_USE_OPTIMIZATION_PROFILE = NO;
 				CODE_SIGN_STYLE = Automatic;
-				OTHER_CFLAGS = (
-					"-msse4.2",
-					"-mpclmul",
+				HEADER_SEARCH_PATHS = (
+					/usr/local/Cellar/openssl/1.0.2o_2/include,
+					"\"$(SRCROOT)/../cityhash-master/src\"",
 				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/usr/local/Cellar/openssl/1.0.2o_2/lib,
+					"\"$(SRCROOT)/../cityhash-master/src/.libs\"",
+				);
+				MACH_O_TYPE = mh_execute;
+				OTHER_CFLAGS = "";
 				OTHER_CPLUSPLUSFLAGS = "";
+				OTHER_LDFLAGS = "-L/usr/local/Cellar/openssl/1.0.2o_2/lib";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;

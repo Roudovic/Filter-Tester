@@ -3,10 +3,13 @@
    version = "1.0">
    <ContextStates>
       <ContextState
-         contextName = "MortonFilter::table_read_and_cmp(MortonFilter::Block*, unsigned char, unsigned char):MortonFilter.hpp">
+         contextName = "MortonFilter::cuckoo_eviction_block(MortonFilter::Block*, unsigned int*):MortonFilter.hpp">
          <PersistentStrings>
             <PersistentString
-               value = "filter[34]">
+               value = "find_fsa_slot_noffset(block,i/2)">
+            </PersistentString>
+            <PersistentString
+               value = "block-&gt;FSA[find_fsa_slot_noffset(block, i/2)]">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -16,11 +19,54 @@
             <PersistentString
                value = "filter[glbi1/64]">
             </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "MortonFilter::Contains1(void*, int, int*):MortonFilter.hpp">
+         <PersistentStrings>
             <PersistentString
-               value = "offset(hf)">
+               value = "(murhash0 &amp; 0xffffffff00000000) &gt;&gt; 32">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "MortonFilter::find_fsa_slot_noffset(MortonFilter::Block*, unsigned char):MortonFilter.hpp">
+      </ContextState>
+      <ContextState
+         contextName = "MortonFilter::table_read_and_cmp(MortonFilter::Block*, unsigned char, unsigned char):MortonFilter.hpp">
+         <PersistentStrings>
+            <PersistentString
+               value = "filter[34]">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "MortonFilter::res_conflict(MortonFilter::Block*, MortonFilter::Block*, MortonFilter::Block*, unsigned int, unsigned int, unsigned char, int, int):MortonFilter.hpp">
+         <PersistentStrings>
+            <PersistentString
+               value = "map2(glbi1 + (1-((glbi1 &amp; 1)&lt;&lt;1))*offset(cuckooed_hf), 64*nb_blocks);">
             </PersistentString>
             <PersistentString
-               value = "offset(cuckooed_hf)">
+               value = "find_fsa_slot_noffset(block1, lbi1)">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "MortonFilter::res_conflict(MortonFilter::Block*, MortonFilter::Block*, MortonFilter::Block*, unsigned int, unsigned int, unsigned char):MortonFilter.hpp">
+         <PersistentStrings>
+            <PersistentString
+               value = "find_fsa_slot_noffset(block1, lbi1)">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "MortonFilter::Contains(void*, int):MortonFilter.hpp">
+      </ContextState>
+      <ContextState
+         contextName = "MortonFilter::Add(void*, int):MortonFilter.hpp">
+         <PersistentStrings>
+            <PersistentString
+               value = "(long)(glbi1 + (1-((glbi1 &amp; 1)&lt;&lt;1))*offset(hf))">
             </PersistentString>
          </PersistentStrings>
       </ContextState>

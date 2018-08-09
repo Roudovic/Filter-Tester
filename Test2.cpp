@@ -15,7 +15,7 @@
 #include "MortonFilter.hpp"
 
 #include "cuckoofilter.h"
-#include "simd-block.h"
+#include "cuckoofilter-master/src/simd-block.h"
 
 
 
@@ -54,9 +54,9 @@ void gen_random(char *s, const int len) {
 const uint32_t size_input = 40;
 const uint32_t max_size_input = 100;
 
-const uint32_t n = 100;
-const uint32_t un_sur_tx_pos = 1;
-const int nb_tests = 10;
+const uint32_t n = 1000;
+const uint32_t un_sur_tx_pos = 1000;
+const int nb_tests = 2;
 
 int second_buckets_items[n];
 
@@ -143,7 +143,6 @@ int main(){
             
             
         }
-         std::cout<< "" << std::endl;
         
         std::chrono::time_point<std::chrono::system_clock> t1 = std::chrono::system_clock::now();
         int fp = 0;
@@ -167,12 +166,12 @@ int main(){
         
         t1 = std::chrono::system_clock::now();
         fp = 0;
-        for (uint64_t i = 0; i<(un_sur_tx_pos) * n; i++) {
-            //std::cout<<
-            Sbloom.possiblyContains((const uint8_t*)testingvalues[i], strlen(testingvalues[i]));
-            if (i >=n && Sbloom.possiblyContains((const uint8_t*)testingvalues[i], strlen(testingvalues[i])) == 1) { fp++; }
-            //<<std::endl ;
-        }
+//        for (uint64_t i = 0; i<(un_sur_tx_pos) * n; i++) {
+//            //std::cout<<
+//            Sbloom.possiblyContains((const uint8_t*)testingvalues[i], strlen(testingvalues[i]));
+//            if (i >=n && Sbloom.possiblyContains((const uint8_t*)testingvalues[i], strlen(testingvalues[i])) == 1) { fp++; }
+//            //<<std::endl ;
+//        }
         t2 = std::chrono::system_clock::now();
         diff = t2 - t1;
         // std::cout << "it took " << diff.count() << " s " << "for the Bloom Filter " <<std::endl;
@@ -251,25 +250,25 @@ int main(){
         //    MORTON FILTER
         
         
-        bool containMorton=false;
-        int size_list = 0;
-        int *size_list_ptr = &size_list;
+        bool containMorton;
+       
         t1 = std::chrono::system_clock::now();
         fp = 0;
         
 
         for (uint64_t i = 0; i<(un_sur_tx_pos) * n; i++) {
-             containMorton = mrtn.Contains1(&integer_testingvalues[i],sizeof(int),second_buckets_items, size_list_ptr);//
+             containMorton = mrtn.Contains1(&integer_testingvalues[i],sizeof(int), second_buckets_items);//
              if(i>=n && containMorton ) { fp++;  }
+        }
+        int i = 0;
+        while(second_buckets_items[i++] > 0){
+            containMorton = mrtn.ContainsElse(&integer_testingvalues[i],sizeof(int));
+            std::cout << i << std::endl;//
+            if(i>=n && containMorton ) { fp++;  }
         }
 //        std::cout<<size_list<<std::endl;
 
-        containMorton=false;
-        for (uint64_t i = 0; i<(un_sur_tx_pos) * n; i++) {
-           containMorton = mrtn.ContainsElse(second_buckets_items+i,sizeof(int));
-            if  (i>=n && containMorton ) { fp++;  }
-            
-        }
+       
         
         t2 = std::chrono::system_clock::now();
         diff = t2 - t1;

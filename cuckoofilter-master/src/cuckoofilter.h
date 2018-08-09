@@ -9,6 +9,7 @@
 #include "packedtable.h"
 #include "printutil.h"
 #include "singletable.h"
+#include "../../cityhash-master/src/city.h"
 
 namespace cuckoofilter {
 // status returned by a cuckoo filter operation
@@ -65,7 +66,10 @@ class CuckooFilter {
 
   inline void GenerateIndexTagHash(const ItemType& item, size_t* index,
                                    uint32_t* tag) const {
-    const uint64_t hash = hasher_(item);
+      int len = 4;
+      uint64_t hash;
+      hash = CityHash64((char*)&item,4);
+      
     *index = IndexHash(hash >> 32);
     *tag = TagHash(hash);
   }

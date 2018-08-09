@@ -1,3 +1,4 @@
+
 //
 //  main.cpp
 //  MortonFilter
@@ -6,7 +7,8 @@
 //  Copyright © 2561 Ludovic Theobald. All rights reserved.
 //
 
-#define NB_ENTRIES 10000
+#define NB_ENTRIES 5001
+
 
 #include <iostream>
 #include "MortonFilter.hpp"
@@ -27,37 +29,53 @@ int main(int argc, const char * argv[]) {
 //    char test2[10] = "HelloYou";
 //    char test3[10] = "CoucouToi";
     
+
     
     for (int i =0; i<NB_ENTRIES ; i++){
         testingvalues[i]=rand();
-        std::cout << mrtn.Add(testingvalues+i,sizeof(int)) << std::endl;
-        if(i%200==0){std::cout << i << std::endl;}
+        mrtn.Add(testingvalues+i,sizeof(int));
+        std::cout <<
+        mrtn.Contains(testingvalues+i,sizeof(int))
+        << std::endl;
+        if(i%50==0)std::cout<<i<<std::endl;
+        
     }
-    for (int i =NB_ENTRIES; i<3*NB_ENTRIES ; i++){
-        testingvalues[i]=rand();
-       
-    }
+//    for (int i =NB_ENTRIES; i<3*NB_ENTRIES ; i++){
+//        testingvalues[i]=rand();
+//       
+//    }
     mrtn.Add(test1, 10);
     
     int size =0;
     int* size_ptr = &size;
     for (int i =0; i<3*NB_ENTRIES ; i++){
-        mrtn.Contains1(testingvalues + i, sizeof(int), second_bucket_items , size_ptr);
+        if(i%100 == 0) std::cout << i << std::endl;
+        std::cout <<
+        mrtn.Contains1(testingvalues + i, sizeof(int), second_bucket_items )
+        << std::endl;
         
+        
+
+    }
+    int i = 0;
+    while(second_bucket_items[i++] > 0){
+        bool containMorton = mrtn.ContainsElse(&testingvalues[i],sizeof(int));
+        std::cout << i << std::endl;//
         
     }
     
-    for (int i =0; i<3*NB_ENTRIES ; i++){
-        
-     mrtn.ContainsElse(second_bucket_items+i,sizeof(int));
-        
-        if(testingvalues[i]==0) break;
-    }
-    
+//    for (int i =0; i<NB_ENTRIES ; i++){
+//
+//        std::cout << mrtn.Contains(testingvalues+i,sizeof(int))  << std::endl;
+//        if(i%50==0)std::cout<<i<<std::endl;
+////        if(testingvalues[i]==0) break;
+//    }
+
     
     
 
     std::cout << mrtn.SizeInBytes() <<std::endl;
+    std::cout << sizeof(struct MortonFilter::Block)*8 << std::endl;
     
 //    uint64_t murtest1;
 //    uint64_t murtest2;
