@@ -13,6 +13,7 @@
 		32D5CF922108758D00918029 /* hashutil.cc in Sources */ = {isa = PBXBuildFile; fileRef = 32D5CF912108758D00918029 /* hashutil.cc */; };
 		32E9C729211C183C00EA0737 /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32E9C728211C183C00EA0737 /* libssl.a */; };
 		32E9C72C211C1D9100EA0737 /* libcityhash.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32E9C72A211C194900EA0737 /* libcityhash.a */; };
+		32E9C731211D510400EA0737 /* libfarmhash.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 32E9C730211D510400EA0737 /* libfarmhash.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -41,6 +42,7 @@
 		32D5CF912108758D00918029 /* hashutil.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = hashutil.cc; path = "../../cuckoofilter-master/src/hashutil.cc"; sourceTree = "<group>"; };
 		32E9C728211C183C00EA0737 /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libssl.a; path = "../../../../../anaconda3/pkgs/openssl-1.0.2o-h26aff7b_0/lib/libssl.a"; sourceTree = "<group>"; };
 		32E9C72A211C194900EA0737 /* libcityhash.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcityhash.a; path = "../cityhash-master/src/.libs/libcityhash.a"; sourceTree = "<group>"; };
+		32E9C730211D510400EA0737 /* libfarmhash.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfarmhash.a; path = "../farmhash-master/src/.libs/libfarmhash.a"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -48,6 +50,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				32E9C731211D510400EA0737 /* libfarmhash.a in Frameworks */,
 				32E9C72C211C1D9100EA0737 /* libcityhash.a in Frameworks */,
 				32E9C729211C183C00EA0737 /* libssl.a in Frameworks */,
 				329F80B421087F35007E1542 /* libcrypto.a in Frameworks */,
@@ -90,6 +93,7 @@
 		3247969820F4B64800FDEC83 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				32E9C730211D510400EA0737 /* libfarmhash.a */,
 				32E9C72A211C194900EA0737 /* libcityhash.a */,
 				32E9C728211C183C00EA0737 /* libssl.a */,
 				329F80B221087F35007E1542 /* libcrypto.a */,
@@ -287,11 +291,13 @@
 				HEADER_SEARCH_PATHS = (
 					/usr/local/Cellar/openssl/1.0.2o_2/include,
 					"\"$(SRCROOT)/../cityhash-master/src\"",
+					"\"$(SRCROOT)/../farmhash-master/src\"",
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					/usr/local/Cellar/openssl/1.0.2o_2/lib,
 					"\"$(SRCROOT)/../cityhash-master/src/.libs\"",
+					"/Users/ludovictheobald/Dash/Filter-Tester/farmhash-master/src/.libs",
 				);
 				MACH_O_TYPE = mh_execute;
 				OTHER_CFLAGS = "";
@@ -309,11 +315,13 @@
 				HEADER_SEARCH_PATHS = (
 					/usr/local/Cellar/openssl/1.0.2o_2/include,
 					"\"$(SRCROOT)/../cityhash-master/src\"",
+					"\"$(SRCROOT)/../farmhash-master/src\"",
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					/usr/local/Cellar/openssl/1.0.2o_2/lib,
 					"\"$(SRCROOT)/../cityhash-master/src/.libs\"",
+					"/Users/ludovictheobald/Dash/Filter-Tester/farmhash-master/src/.libs",
 				);
 				MACH_O_TYPE = mh_execute;
 				OTHER_CFLAGS = "";

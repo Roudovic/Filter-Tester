@@ -1,5 +1,6 @@
 #include "BloomFilter.h"
 #include "MurmurHash3.h"
+#include "farmhash-master/src/farmhash.h"
 
 BloomFilter::BloomFilter(uint64_t size, uint8_t numHashes)
       : m_bits(size),
@@ -12,6 +13,17 @@ std::array<uint64_t, 2> hash(const uint8_t *data,
 
   return hashValue;
 }
+
+//std::array<uint64_t, 2> hash(const uint8_t *data,
+//                             std::size_t len) {
+//    std::array<uint64_t, 2> hashValue;
+//    util::uint128_t hash128 = util::Fingerprint128((char*)data, len);
+//    hashValue[0]= util::Uint128Low64(hash128);
+//    hashValue[1]= util::Uint128High64(hash128);
+//
+//    return hashValue;
+//}
+
 
 inline uint64_t nthHash(uint8_t n,
                         uint64_t hashA,

@@ -24,6 +24,7 @@
 #include "hashutil.h"
 //#include "../../MurmurHash3.cpp"
 #include "../../cityhash-master/src/city.h"
+#include "../../farmhash-master/src/farmhash.h"
 
 using uint32_t = ::std::uint32_t;
 using uint64_t = ::std::uint64_t;
@@ -61,8 +62,8 @@ class SimdBlockFilter {
       directory_(that.directory_),
       hasher_(that.hasher_) {}
   ~SimdBlockFilter() noexcept;
-  void Add(const uint64_t key) noexcept;
-  bool Find(const uint64_t key) const noexcept;
+  void Add(const char* key, unsigned len) noexcept;
+  bool Find(const char* key, unsigned len) const noexcept;
   uint64_t SizeInBytes() const { return sizeof(Bucket) * (1ull << log_num_buckets_); }
 
  private:
@@ -126,10 +127,11 @@ SimdBlockFilter<HashFamily>::MakeMask(const uint32_t hash) noexcept {
 
 template <typename HashFamily>
 [[gnu::always_inline]] inline void
-SimdBlockFilter<HashFamily>::Add(const uint64_t key) noexcept {
+SimdBlockFilter<HashFamily>::Add(const char* key, unsigned len) noexcept {
      uint64_t hash ;
 //    MurmurHash3_x64_128( &key, 4 , 0, &hash);
-    hash = CityHash64((char*)&key,4);
+//    hash = CityHash64(key,len);
+    hash = util::Fingerprint64(key,len);
   const uint32_t bucket_idx = hash & directory_mask_;
     if(!__builtin_cpu_supports("avx2")){
         uint32_t mask[8];
@@ -164,9 +166,10 @@ SimdBlockFilter<HashFamily>::Add(const uint64_t key) noexcept {
 
 template <typename HashFamily>
 [[gnu::always_inline]] inline bool
-SimdBlockFilter<HashFamily>::Find(const uint64_t key) const noexcept {
+SimdBlockFilter<HashFamily>::Find(const char* key, unsigned len) const noexcept {
    uint64_t hash ;
-    hash = CityHash64((char*)&key,4);
+//    hash = CityHash64(key, len);
+    hash = util::Fingerprint64(key,len);
   const uint32_t bucket_idx = hash & directory_mask_;
   const __m256i mask = MakeMask(hash >> log_num_buckets_);
   const __m256i bucket = reinterpret_cast<__m256i*>(directory_)[bucket_idx];

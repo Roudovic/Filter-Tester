@@ -10,6 +10,7 @@
 #include "printutil.h"
 #include "singletable.h"
 #include "../../cityhash-master/src/city.h"
+#include "../../farmhash-master/src/farmhash.h"
 
 namespace cuckoofilter {
 // status returned by a cuckoo filter operation
@@ -65,10 +66,12 @@ class CuckooFilter {
   }
 
   inline void GenerateIndexTagHash(const ItemType& item, size_t* index,
-                                   uint32_t* tag) const {
-      int len = 4;
-      uint64_t hash;
-      hash = CityHash64((char*)&item,4);
+                                   uint32_t* tag, unsigned len) const {
+      
+      
+//      uint64_t hash = CityHash64((char*)&item, len);
+//    xxh::hash_t<64> hash = xxh::xxhash<64>((char*)item,len);
+      uint64_t hash = util::Fingerprint64((char*)&item, len);
       
     *index = IndexHash(hash >> 32);
     *tag = TagHash(hash);
@@ -104,10 +107,10 @@ class CuckooFilter {
   ~CuckooFilter() { delete table_; }
 
   // Add an item to the filter.
-  Status Add(const ItemType &item);
+  Status Add(const ItemType &item, unsigned len);
 
   // Report if the item is inserted, with false positive rate.
-  Status Contain(const ItemType &item) const;
+  Status Contain(const ItemType &item, unsigned len) const;
 
   // Delete an key from the filter
   Status Delete(const ItemType &item);
@@ -126,7 +129,7 @@ class CuckooFilter {
 template <typename ItemType, size_t bits_per_item,
           template <size_t> class TableType, typename HashFamily>
 Status CuckooFilter<ItemType, bits_per_item, TableType, HashFamily>::Add(
-    const ItemType &item) {
+    const ItemType &item, unsigned len) {
   size_t i;
   uint32_t tag;
 
@@ -134,7 +137,7 @@ Status CuckooFilter<ItemType, bits_per_item, TableType, HashFamily>::Add(
     return NotEnoughSpace;
   }
 
-  GenerateIndexTagHash(item, &i, &tag);
+  GenerateIndexTagHash(item, &i, &tag, len);
   return AddImpl(i, tag);
 }
 
@@ -168,12 +171,12 @@ Status CuckooFilter<ItemType, bits_per_item, TableType, HashFamily>::AddImpl(
 template <typename ItemType, size_t bits_per_item,
           template <size_t> class TableType, typename HashFamily>
 Status CuckooFilter<ItemType, bits_per_item, TableType, HashFamily>::Contain(
-    const ItemType &key) const {
+    const ItemType &key, unsigned len) const {
   bool found = false;
   size_t i1, i2;
   uint32_t tag;
 
-  GenerateIndexTagHash(key, &i1, &tag);
+  GenerateIndexTagHash(key, &i1, &tag, len);
   i2 = AltIndex(i1, tag);
 
   assert(i1 == AltIndex(i2, tag));

@@ -17,7 +17,7 @@ public:
 private:
 
   uint8_t m_numHashes;
-  std::vector<bool[WORD_SIZE]> m_bits;
+    std::vector<std::array<bool,32>> m_bits;
 
 
 };

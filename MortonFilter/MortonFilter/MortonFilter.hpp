@@ -15,9 +15,10 @@
 #include <vector>
 #include "MurmurHash3.h"
 #include "hashutil.h"
-#include "../../xxhash.hpp"
+//#include "../../xxhash.hpp"
 #include "../../cityhash-master/src/city.h"
 #include "../../cityhash-master/src/citycrc.h"
+#include "../../farmhash-master/src/farmhash.h"
 
 
 #endif /* MortonFilter_hpp */
@@ -219,9 +220,9 @@ inline bool MortonFilter::OTA_bit_is_unset(Block *block, uint8_t lbi){
 
 
 inline int MortonFilter::Add(void* __restrict data, int len){
-    uint64_t murhash0;
+//    uint64_t murhash0;
 //    MurmurHash3_x64_128( data, len, 0, &murhash0);
-    int* key = (int*) data;
+    int* key = (int*)data;
 //    murhash0 = hasher(*key );
     
 //    TEST FOR XXHASH
@@ -229,8 +230,13 @@ inline int MortonFilter::Add(void* __restrict data, int len){
 //    TEST FOR XXHASH
     
     //    TEST FOR CITYHASH
-    murhash0 = CityHash64((char*)data, 4);
+//   uint64_t murhash0 = CityHash64((char*)data, len);
     //    TEST FOR CITYHASH
+    
+    //    TEST FOR FARMHASH
+    uint64_t murhash0 = util::Fingerprint64((char*)data, len);
+    //    TEST FOR FARMHASH
+    
     
     uint32_t glbi1 = (murhash0 & 0xffffffff00000000)>>32;
     int nb_buckets = 64 * nb_blocks;
@@ -496,9 +502,8 @@ uint8_t MortonFilter::cuckoo_eviction_block(MortonFilter::Block *block, uint32_t
 
 
 bool MortonFilter::Contains(void* __restrict data, int len){
-    uint64_t murhash0;
+//    uint64_t murhash0;
 //        MurmurHash3_x64_128( data, len, 0, &murhash0);
-    int* key = (int*) data;
 //    murhash0 = hasher(*key );
     
     //    TEST FOR XXHASH
@@ -507,8 +512,12 @@ bool MortonFilter::Contains(void* __restrict data, int len){
     
     
     //    TEST FOR CITYHASH
-    murhash0 = CityHash64((char*)data, 4);
+//    murhash0 = CityHash64((char*)data, len);
     //    TEST FOR CITYHASH
+    
+    //    TEST FOR FARMHASH
+    uint64_t murhash0 = util::Fingerprint64((char*)data, len);
+    //
     
     uint32_t glbi1 = (murhash0 & 0xffffffff00000000)>>32;
     int nb_buckets = 64 * nb_blocks;
@@ -538,18 +547,24 @@ bool MortonFilter::Contains(void* __restrict data, int len){
 }
 
 inline bool MortonFilter::Contains1(void*data, int len, int* second_bucket_items){
-    uint64_t murhash0;
+    
 //    MurmurHash3_x64_128( data, len, 0, &murhash0);
-    int* key = (int*) data;
 //    murhash0 = hasher(*key);
-    
+//    char* key = (char*)data;
     //    TEST FOR XXHASH
-//    xxh::hash_t<64> murhash0 = xxh::xxhash<64>(key,4);
+//    xxh::hash_t<64> murhash0 = xxh::xxhash<64>(key,len);
     //    TEST FOR XXHASH
     
     //    TEST FOR CITYHASH
-    murhash0 = CityHash64((char*)data, 4);
+//    uint64_t murhash0 = CityHash64((char*)data, len);
     //    TEST FOR CITYHASH
+    
+    
+    //    TEST FOR FARMHASH
+    uint64_t murhash0 = util::Fingerprint64((char*)data, len);
+    //    TEST FOR FARMHASH
+    
+    
     
     int nb_buckets = 64 * nb_blocks;
     uint32_t glbi1 = (murhash0 & 0xffffffff00000000)>>32;
@@ -575,7 +590,6 @@ inline bool MortonFilter::Contains1(void*data, int len, int* second_bucket_items
 inline bool MortonFilter::ContainsElse(void* __restrict data, int len){
     uint64_t murhash0;
 //    MurmurHash3_x64_128( data, len, 0, &murhash0);
-    int* key = (int*) data;
 //    murhash0 = hasher(*key);
     
     //    TEST FOR XXHASH
@@ -583,7 +597,7 @@ inline bool MortonFilter::ContainsElse(void* __restrict data, int len){
     //    TEST FOR XXHASH
     
 //    TEST FOR CITYHASH
-   murhash0 = CityHash64((char*)data, 4);
+   murhash0 = CityHash64((char*)data, len);
 //    TEST FOR CITYHASH
     
     int nb_buckets = 64 * nb_blocks;
