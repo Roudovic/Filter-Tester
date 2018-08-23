@@ -13,11 +13,13 @@
 #include "bloom_filter.hpp"
 #include <fstream>
 #include "MortonFilter.hpp"
+#include "gcs.h"
+#include "BloomFilter_Dash.hpp"
 
 #include "cuckoofilter.h"
 #include "cuckoofilter-master/src/simd-block.h"
 
-
+#define BATCH 128
 
 
 
@@ -43,11 +45,11 @@ void gen_random(char *s, const int len) {
     s[len] = 0;
 }
 
-const uint32_t size_input = 20 ;
+const uint32_t size_input = 36 ;
 const uint32_t max_size_input = 1000;
 
-const uint32_t n = 200;
-const uint32_t un_sur_tx_pos = 1000;
+const uint32_t n = 8192;
+const uint32_t un_sur_tx_pos = 10;
 const int nb_tests = 10;
 
 int second_buckets_items[n];
@@ -56,14 +58,14 @@ uint64_t m = floor(-1.44*n*log2(FP));
 uint8_t k = floor(log(2)*m/n);
 //printf("k=%d\n",k);
 //std::cout<< "filter size is : " <<m<<std::endl;
-double temps_moyens[6];
-double fp_means[6];
-int filter_sizes[6];
+double temps_moyens[8];
+double fp_means[8];
+int filter_sizes[8];
 int tours = 0;
 
 char s[max_size_input] = " ";
 char testingvalues[(un_sur_tx_pos)*n][max_size_input];
-int integer_testingvalues[(un_sur_tx_pos)*n];
+//int integer_testingvalues[(un_sur_tx_pos)*n];
 
 int main(){
     
@@ -75,12 +77,13 @@ int main(){
     while(tours < nb_tests){
         
         
-        
+        GCSBuilder gcs_b(n, 2*8192);
         
         std::size_t l = size_input;
         
         BloomFilter_1 bloom = BloomFilter_1(m,k);
         BloomFilter Sbloom = BloomFilter(m, k);
+        BloomFilter_Dash bloom_D(m,k);
         
         //Cuckoo filter
         const uint8_t fingerprint_size = floor(log2(8/FP));
@@ -111,19 +114,22 @@ int main(){
         
         for(uint64_t i = 0; i<n; i++){
             
+            
             gen_random(s,size_input);
             strcpy(testingvalues[i],s);
             
-            srand(i);
-            integer_testingvalues[i]=rand();
+//            srand(i);
+//            integer_testingvalues[i]=rand();
             
             bloom.add((const uint8_t*)s, l);
             Sbloom.add((const uint8_t*)s, l);
+            bloom_D.add((const uint8_t*)s, l);
             
             mrtn.Add(testingvalues[i],l);
             
+            gcs_b.add(testingvalues[i], l);
             
-            newbloom.insert(integer_testingvalues[i]);
+            newbloom.insert(testingvalues[i],l);
             simdbloom.Add(testingvalues[i], l);
             filter.Add(testingvalues[i],l);
         }
@@ -131,9 +137,9 @@ int main(){
         for (uint64_t i=n; i<(un_sur_tx_pos)*n; i++){
             gen_random(s,size_input);
             strcpy(testingvalues[i],s );
-            srand(i);
-            integer_testingvalues[i]=rand();
-            
+//            srand(i);
+//            integer_testingvalues[i]=rand();
+//
             
         }
         bool contains = false;
@@ -144,6 +150,7 @@ int main(){
          for(uint64_t i = 0; i<(un_sur_tx_pos)*n; i++){
          // std::cout<<
          contains = bloom.possiblyContains((const uint8_t*)testingvalues[i], strlen(testingvalues[i]));
+             if(i<n && !contains){std::cout << "faux negatif bloom1" << std::endl;}
          if (i >n && contains) {
          fp++;}
          //std::cout << testingvalues[i] << std::endl;
@@ -157,6 +164,8 @@ int main(){
         // std::cout << "Its false positive rate is " << (double)fp / (un_sur_tx_pos* n) << std::endl;
         temps_moyens[0]+=diff.count();
         fp_means[0]+=(double)fp / (un_sur_tx_pos* n);
+        if(tours==1){std::cout << "Bloom-1 size : " << bloom.SizeInBytes() << std::endl;}
+        
         
         t1 = std::chrono::system_clock::now();
         fp = 0;
@@ -171,6 +180,7 @@ int main(){
         diff = t2 - t1;
         // std::cout << "it took " << diff.count() << " s " << "for the Bloom Filter " <<std::endl;
         // std::cout << "Its false positive rate is " << (double)fp /(un_sur_tx_pos* n) << std::endl;
+        if(tours==1){std::cout << "Bloom size : " << Sbloom.SizeInBytes() << std::endl;}
         temps_moyens[1]+=diff.count();
         fp_means[1]+=(double)fp / (un_sur_tx_pos* n);
         
@@ -226,14 +236,15 @@ int main(){
         t1 = std::chrono::system_clock::now();
         fp = 0;
         
-        for (uint64_t i = 0; i<(un_sur_tx_pos) * n; i++) {
-            
+        for (uint64_t i = 0; i<((un_sur_tx_pos) * n)/BATCH; i++) {
+            for(int j = 0; j<BATCH; j++){
             //std::cout<<
             
-            contains = filter.Contain(testingvalues[i], l);//<<std::endl;
-            if(i<n && contains != 0){std::cout << "faux negatif cuckoo" << std::endl;}
-            if (i>=n && contains==0)  { fp++;  }
+            contains = filter.Contain(testingvalues[BATCH*i+j], l);//<<std::endl;
+            if(BATCH*i+j<n && contains != 0){std::cout << "faux negatif cuckoo" << std::endl;}
+            if (BATCH*i+j>=n && contains==0)  { fp++;  }
             //<<std::endl ;
+        }
         }
         t2 = std::chrono::system_clock::now();
         diff = t2 - t1;
@@ -257,10 +268,12 @@ int main(){
         fp = 0;
         
         
-        for (uint64_t i = 0; i<(un_sur_tx_pos) * n; i++) {
-            containMorton = mrtn.Contains1(testingvalues[i],l, second_buckets_items);//
+        for (uint64_t i = 0; i<((un_sur_tx_pos) * n)/BATCH; i++) {
+            for(int j = 0; j<BATCH ; j++){
+            containMorton = mrtn.Contains1(testingvalues[BATCH*i+j],l, second_buckets_items);//
 //            if(i<n && !containMorton){std::cout << "faux negatif Morton" << std::endl;}
-            if(i>=n && containMorton ) { fp++;  }
+            if(BATCH*i+j>=n && containMorton ) { fp++;  }
+        }
         }
         int i = 0;
 //        while(second_buckets_items[i++] > 0){
@@ -276,12 +289,63 @@ int main(){
         diff = t2 - t1;
         
         if(tours ==1){std::cout << "Morton Filter false positive rate is " << (double)fp / (un_sur_tx_pos*n) << std::endl;
-            std::cout << "Morton filter size : " << mrtn.SizeInBytes() << std::endl;
+            std::cout << "Morton filter size : " << mrtn.SizeInBits() << std::endl;
             //filter_sizes[3]=parameters.optimal_parameters.table_size;
             
         }
         temps_moyens[5]+=diff.count();
         fp_means[5]+=(double)fp / (un_sur_tx_pos* n);
+        
+        
+//        GOLOMB CODED SETS
+        
+        std::ofstream out("table.gcs", std::ios::binary|std::ios::out);
+        gcs_b.finalize(out);
+        out.close();
+        std::ifstream f("table.gcs", std::ios::binary|std::ios::in);
+        GCSQuery gcs(f);
+        
+        t1 = std::chrono::system_clock::now();
+        fp = 0;
+        
+        
+        for (uint64_t i = 0; i<(un_sur_tx_pos) * n; i++) {
+            contains = gcs.query(testingvalues[i],l);
+            if(i>=n && contains ) { fp++;  }
+        }
+    
+        t2 = std::chrono::system_clock::now();
+        diff = t2 - t1;
+        
+        temps_moyens[7]+=diff.count();
+        fp_means[7]+=(double)fp / (un_sur_tx_pos* n);
+        
+        
+//        Dash/bitcoin BF
+        t1 = std::chrono::system_clock::now();
+        fp = 0;
+        for (uint64_t i = 0; i<(un_sur_tx_pos) * n; i++) {
+            contains = false;
+            //std::cout<<
+            contains = bloom_D.possiblyContains((const uint8_t*)testingvalues[i], l);
+            if (i >=n && contains) { fp++; }
+            //<<std::endl ;
+        }
+        t2 = std::chrono::system_clock::now();
+        diff = t2 - t1;
+        // std::cout << "it took " << diff.count() << " s " << "for the Bloom Filter " <<std::endl;
+        // std::cout << "Its false positive rate is " << (double)fp /(un_sur_tx_pos* n) << std::endl;
+        if(tours==1){std::cout << "Bloom Dash size : " << bloom_D.SizeInBytes() << std::endl;}
+        temps_moyens[6]+=diff.count();
+        fp_means[6]+=(double)fp / (un_sur_tx_pos* n);
+        
+        
+        
+        
+        if(tours ==1){std::cout << "GCS false positive rate is " << (double)fp / (un_sur_tx_pos*n) << std::endl;
+            std::cout << "GCS Size :" << gcs.SizeInBytes()*8 << std::endl;
+        }
+        
         
         //
         
@@ -289,8 +353,8 @@ int main(){
         
     }
     
-    std::array<std::string,6> names = {{ "Bloom-1 :", " Standard Bloom", "Cuckoo", "Another Bloom", "SIMD", "Morton" }};
-    for(int i =0; i<6; i++){
+    std::array<std::string,8> names = {{ "Bloom-1 :", " Standard Bloom", "Cuckoo", "Another Bloom", "SIMD", "Morton" , "Dash Bloom filter", "GCS" }};
+    for(int i =0; i<8; i++){
         std::cout << std::endl;
         temps_moyens[i]=temps_moyens[i]/nb_tests;
         fp_means[i]=fp_means[i]/nb_tests;

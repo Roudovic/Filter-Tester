@@ -5,17 +5,19 @@
 
 
 BloomFilter_1::BloomFilter_1(uint64_t size, uint8_t numHashes)
-      : m_bits(size),
+      : m_bits(size/WORD_SIZE),
         m_numHashes(numHashes) {}
 
 
 std::array<uint64_t, 2> farmhash(const uint8_t *data,
                              std::size_t len) {
     std::array<uint64_t, 2> hashValue;
-    util::uint128_t hash128 = util::Fingerprint128((char*)data, len);
-    hashValue[0]= util::Uint128Low64(hash128);
-    hashValue[1]= util::Uint128High64(hash128);
-    
+//    util::uint128_t zer(0,0);
+//    util::uint128_t hash128 = util::Hash128WithSeed((char*) data, len, zer);
+//    hashValue[0]= util::Uint128Low64(hash128);
+//    hashValue[1]= util::Uint128High64(hash128);
+    hashValue[0]= util::Hash32WithSeed((char*)data,len,0);
+    hashValue[1]= util::Hash32WithSeed((char*)data,len,1);
     return hashValue;
 }
 
@@ -31,7 +33,7 @@ inline uint64_t nthHash(uint8_t n,
 
 void BloomFilter_1::add(const uint8_t *data, std::size_t len) {
   auto hashValues = farmhash(data,len);
-  uint16_t word = hashValues[1]%m_bits.size();
+    uint16_t word = util::Hash32((char*)data, len) % m_bits.size();
   for (int n = 0; n < m_numHashes; n++) {
       m_bits[word][nthHash(n, hashValues[0], hashValues[1], WORD_SIZE)] = true;
   }
@@ -39,7 +41,8 @@ void BloomFilter_1::add(const uint8_t *data, std::size_t len) {
 
 bool BloomFilter_1::possiblyContains(const uint8_t *data, std::size_t len) const {
   auto hashValues = farmhash(data, len);
-  uint16_t word = hashValues[1]%m_bits.size();
+//  uint16_t word = hashValues[1]%m_bits.size();
+    uint16_t word = util::Hash32((char*)data, len) % m_bits.size();
   for (int n = 0; n < m_numHashes; n++) {
       if (!m_bits[word][nthHash(n, hashValues[0], hashValues[1], WORD_SIZE)]) {
           return false;
@@ -47,4 +50,8 @@ bool BloomFilter_1::possiblyContains(const uint8_t *data, std::size_t len) const
   }
 
   return true;
+}
+
+int BloomFilter_1::SizeInBytes(){
+    return m_bits.size()*sizeof(std::array<bool,WORD_SIZE>);
 }

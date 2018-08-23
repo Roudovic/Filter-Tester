@@ -11,6 +11,7 @@
 #include "singletable.h"
 #include "../../cityhash-master/src/city.h"
 #include "../../farmhash-master/src/farmhash.h"
+#include "../../xxhash.hpp"
 
 namespace cuckoofilter {
 // status returned by a cuckoo filter operation
@@ -71,7 +72,7 @@ class CuckooFilter {
       
 //      uint64_t hash = CityHash64((char*)&item, len);
 //    xxh::hash_t<64> hash = xxh::xxhash<64>((char*)item,len);
-      uint64_t hash = util::Fingerprint64((char*)&item, len);
+      uint64_t hash = util::Hash64WithSeed((char*)&item, len, 0);
       
     *index = IndexHash(hash >> 32);
     *tag = TagHash(hash);

@@ -6,23 +6,26 @@ BloomFilter::BloomFilter(uint64_t size, uint8_t numHashes)
       : m_bits(size),
         m_numHashes(numHashes) {}
 
-std::array<uint64_t, 2> hash(const uint8_t *data,
-                             std::size_t len) {
-  std::array<uint64_t, 2> hashValue;
-  MurmurHash3_x64_128(data, len, 0, hashValue.data());
-
-  return hashValue;
-}
-
 //std::array<uint64_t, 2> hash(const uint8_t *data,
 //                             std::size_t len) {
-//    std::array<uint64_t, 2> hashValue;
-//    util::uint128_t hash128 = util::Fingerprint128((char*)data, len);
+//  std::array<uint64_t, 2> hashValue;
+//  MurmurHash3_x64_128(data, len, 0, hashValue.data());
+//
+//  return hashValue;
+//}
+
+std::array<uint64_t, 2> hash(const uint8_t *data,
+                             std::size_t len) {
+    std::array<uint64_t, 2> hashValue;
+    util::uint128_t zer(0,0);
+//    util::uint128_t hash128 = util::Hash128WithSeed((char*) data, len, zer);
 //    hashValue[0]= util::Uint128Low64(hash128);
 //    hashValue[1]= util::Uint128High64(hash128);
-//
-//    return hashValue;
-//}
+    hashValue[0]= util::Hash32WithSeed((char*)data,len,0);
+    hashValue[1]= util::Hash32WithSeed((char*)data,len,1);
+
+    return hashValue;
+}
 
 
 inline uint64_t nthHash(uint8_t n,
@@ -50,4 +53,8 @@ bool BloomFilter::possiblyContains(const uint8_t *data, std::size_t len) const  
   }
 
   return true;
+}
+
+int BloomFilter::SizeInBytes(){
+    return m_bits.size();
 }

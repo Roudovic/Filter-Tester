@@ -34,11 +34,11 @@ class MortonFilter{
     uint32_t nb_blocks;
     typedef struct Block {
         uint64_t FCA[2];
-        uint16_t OTA;
         uint8_t FSA[46];
+        uint16_t OTA;
         
-    }Block;
-//    __attribute__((packed))Block
+        
+    } __attribute((aligned(64)))Block;
    
     
     Block *filter;
@@ -53,24 +53,24 @@ class MortonFilter{
     
     bool Contains(void* __restrict data, int len);
     
-    bool Contains1(void* __restrict data, int len, int* second_bucket_items);
+    bool Contains1(void* __restrict data, int len, int* second_bucket_items) const ;
     
     bool ContainsElse(void* __restrict data, int len);
     
-    bool table_read_and_cmp(Block *block, uint8_t lbi, uint8_t Fx);
+    bool table_read_and_cmp(Block *block, uint8_t lbi, uint8_t Fx) const ;
     
-    bool OTA_bit_is_unset(Block *block, uint8_t lbi);
+    bool OTA_bit_is_unset(Block *block, uint8_t lbi) const;
     
     int res_conflict(Block* filter, Block* block1, Block* block2, uint32_t glbi1, uint32_t glbi2, uint8_t hf, int overflow_type1, int overflow_type2 );
     
     uint8_t cuckoo_eviction_block( Block* block, uint32_t *glbi) ;
     
     
-    uint16_t find_fsa_slot(Block* block, uint8_t lbi );
+    uint16_t find_fsa_slot(Block* block, uint8_t lbi ) const ;
     
-    uint16_t find_fsa_slot_noffset(Block *block, uint8_t lbi);
+    uint16_t find_fsa_slot_noffset(Block *block, uint8_t lbi) const;
     
-    int SizeInBytes();
+    int SizeInBits();
     
     // TODO : Create a method to get the real FCA[i] without using bits arithmetic everytime
     // like block.getFCAindex(i)
@@ -84,7 +84,7 @@ class MortonFilter{
     }
 };
 
-int MortonFilter::SizeInBytes(){
+int MortonFilter::SizeInBits(){
     return nb_blocks*sizeof(struct Block)*8;
     
 }
@@ -110,7 +110,7 @@ inline uint8_t offset(uint8_t Fx){
     return  (64 + (Fx & (OFF_RANGE-1))) | 1;
 }
 
-inline uint16_t MortonFilter::find_fsa_slot(MortonFilter::Block *block, uint8_t lbi){
+inline uint16_t MortonFilter::find_fsa_slot(MortonFilter::Block *block, uint8_t lbi) const {
     __uint128_t one_128 = 1;
     __uint128_t fullnessCounterArrayMask = (one_128 << (2 * lbi)) - 1;
     //    __uint128_t FCA128 = (__uint128_t)block->FCA;
@@ -144,7 +144,7 @@ inline uint16_t MortonFilter::find_fsa_slot(MortonFilter::Block *block, uint8_t 
 }
 
 
-inline uint16_t MortonFilter::find_fsa_slot_noffset(MortonFilter::Block *block, uint8_t lbi){
+inline uint16_t MortonFilter::find_fsa_slot_noffset(MortonFilter::Block *block, uint8_t lbi) const {
     __uint128_t one_128 = 1;
     __uint128_t fullnessCounterArrayMask = (one_128 << (2 * lbi)) - 1;
     
@@ -213,7 +213,7 @@ inline void MortonFilter::set_OTA(Block *block, uint8_t lbi){
     
 }
 
-inline bool MortonFilter::OTA_bit_is_unset(Block *block, uint8_t lbi){
+inline bool MortonFilter::OTA_bit_is_unset(Block *block, uint8_t lbi) const {
     return (block->OTA & (1<< (mapOTA(lbi,16)))) == 0;
 //    return false;
 }
@@ -475,7 +475,7 @@ uint8_t MortonFilter::cuckoo_eviction_block(MortonFilter::Block *block, uint32_t
 }
 
 
-    inline bool MortonFilter::table_read_and_cmp(MortonFilter::Block *block, uint8_t lbi, uint8_t Fx){
+    inline bool MortonFilter::table_read_and_cmp(MortonFilter::Block *block, uint8_t lbi, uint8_t Fx) const {
         uint64_t mask0 = (1ull<<(2*lbi)) | (1ull<<(2 * lbi +1));
         uint64_t mask1 = (1ull<<(2*(lbi-32))) | (1ull<<(2 * (lbi-32) + 1));
         uint64_t bkt_size = 0;
@@ -546,7 +546,7 @@ bool MortonFilter::Contains(void* __restrict data, int len){
     return false;
 }
 
-inline bool MortonFilter::Contains1(void*data, int len, int* second_bucket_items){
+inline bool MortonFilter::Contains1(void*data, int len, int* second_bucket_items) const {
     
 //    MurmurHash3_x64_128( data, len, 0, &murhash0);
 //    murhash0 = hasher(*key);

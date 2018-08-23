@@ -49,6 +49,8 @@ class HashUtil {
 // variables via integer arithmetic without primes".
 class TwoIndependentMultiplyShift {
   unsigned __int128 multiply_, add_;
+    __uint128_t a[32];
+
 
  public:
   TwoIndependentMultiplyShift() {
@@ -60,11 +62,30 @@ class TwoIndependentMultiplyShift {
         *v |= random();
       }
     }
+      
+      for (int i = 0; i<32; i++){
+          *(a+i) = random();
+      }
   }
 
   uint64_t operator()(uint64_t key) const {
     return (add_ + multiply_ * static_cast<decltype(multiply_)>(key)) >> 64;
   }
+    
+//    uint64_t operator()(const char* key, int len) const {
+//
+//        int d = (len + 7)>>3;
+//        uint64_t x[d];
+//        x[d-1]=0;
+//        memcpy(x,key,len);
+//        __uint128_t sum = 0;
+//        for(int i = 0; i<d; i+=2){
+//            sum += (a[i]+x[i+1])*(a[i+1]*x[i]);
+//        }
+//        sum+= a[d];
+//        sum = sum >> 64;
+//        return sum;
+//    }
 };
 
 // See Patrascu and Thorup's "The Power of Simple Tabulation Hashing"

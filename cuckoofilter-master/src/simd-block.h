@@ -128,10 +128,12 @@ SimdBlockFilter<HashFamily>::MakeMask(const uint32_t hash) noexcept {
 template <typename HashFamily>
 [[gnu::always_inline]] inline void
 SimdBlockFilter<HashFamily>::Add(const char* key, unsigned len) noexcept {
-     uint64_t hash ;
+    
 //    MurmurHash3_x64_128( &key, 4 , 0, &hash);
 //    hash = CityHash64(key,len);
-    hash = util::Fingerprint64(key,len);
+    
+    const uint64_t hash = util::Hash64WithSeed(key,len,0);
+//    const auto hash = hasher_(key,len);
   const uint32_t bucket_idx = hash & directory_mask_;
     if(!__builtin_cpu_supports("avx2")){
         uint32_t mask[8];
@@ -167,9 +169,10 @@ SimdBlockFilter<HashFamily>::Add(const char* key, unsigned len) noexcept {
 template <typename HashFamily>
 [[gnu::always_inline]] inline bool
 SimdBlockFilter<HashFamily>::Find(const char* key, unsigned len) const noexcept {
-   uint64_t hash ;
+//   const auto hash = hasher_(key,len);
+    
 //    hash = CityHash64(key, len);
-    hash = util::Fingerprint64(key,len);
+    const uint64_t hash = util::Hash64WithSeed(key,len,0);
   const uint32_t bucket_idx = hash & directory_mask_;
   const __m256i mask = MakeMask(hash >> log_num_buckets_);
   const __m256i bucket = reinterpret_cast<__m256i*>(directory_)[bucket_idx];

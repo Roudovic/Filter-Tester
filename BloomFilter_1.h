@@ -5,7 +5,7 @@
 #include <vector>
 #include <stdint.h>
 #include <array>
-#define WORD_SIZE 32
+#define WORD_SIZE 512
 
 class BloomFilter_1 {
 public:
@@ -13,11 +13,11 @@ public:
 
   void add(const uint8_t *data, std::size_t len);
   bool possiblyContains(const uint8_t *data, std::size_t len) const;
-
+int SizeInBytes();
 private:
 
   uint8_t m_numHashes;
-    std::vector<std::array<bool,32>> m_bits;
+    std::vector<std::array<bool,WORD_SIZE>> m_bits;
 
 
 };

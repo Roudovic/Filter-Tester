@@ -12,7 +12,7 @@ struct BloomFilter {
 
   void add(const uint8_t *data, std::size_t len);
   bool possiblyContains(const uint8_t *data, std::size_t len) const;
-
+    int SizeInBytes();
 private:
   uint8_t m_numHashes;
   std::vector<bool> m_bits;

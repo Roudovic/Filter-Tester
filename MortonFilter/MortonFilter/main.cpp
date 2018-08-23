@@ -7,7 +7,7 @@
 //  Copyright © 2561 Ludovic Theobald. All rights reserved.
 //
 
-#define NB_ENTRIES 5001
+#define NB_ENTRIES 1000
 
 
 #include <iostream>
@@ -16,7 +16,7 @@
 MortonFilter mrtn = MortonFilter(NB_ENTRIES);
 
 
-int testingvalues[3*NB_ENTRIES];
+int testingvalues[300*NB_ENTRIES];
 int second_bucket_items[NB_ENTRIES];
 
 
@@ -40,15 +40,15 @@ int main(int argc, const char * argv[]) {
         if(i%50==0)std::cout<<i<<std::endl;
         
     }
-//    for (int i =NB_ENTRIES; i<3*NB_ENTRIES ; i++){
-//        testingvalues[i]=rand();
-//       
-//    }
+    for (int i =NB_ENTRIES; i<300*NB_ENTRIES ; i++){
+        testingvalues[i]=rand();
+       
+    }
     mrtn.Add(test1, 10);
     
     int size =0;
     int* size_ptr = &size;
-    for (int i =0; i<3*NB_ENTRIES ; i++){
+    for (int i =0; i<300*NB_ENTRIES ; i++){
         if(i%100 == 0) std::cout << i << std::endl;
         std::cout <<
         mrtn.Contains1(testingvalues + i, sizeof(int), second_bucket_items )
@@ -74,7 +74,7 @@ int main(int argc, const char * argv[]) {
     
     
 
-    std::cout << mrtn.SizeInBytes() <<std::endl;
+    std::cout << mrtn.SizeInBits() <<std::endl;
     std::cout << sizeof(struct MortonFilter::Block)*8 << std::endl;
     
 //    uint64_t murtest1;
