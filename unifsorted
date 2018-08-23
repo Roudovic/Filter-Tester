@@ -1,0 +1,28 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Aug 23 14:12:06 2018
+
+@author: ludovictheobald
+"""
+import random
+import matplotlib.pyplot as plt
+
+n=2000
+unif = [0]*n
+for i in range(n):
+    unif[i]=random.random()
+
+unif.sort()
+
+sorted_unif = [0]*n
+
+sorted_unif[0]=unif[0]
+for i in range(1,n):
+    sorted_unif[i]=unif[i]-unif[i-1]
+    
+sorted_unif.sort()
+
+plt.plot(sorted_unif) 
+plt.show() 
+print(sorted_unif)
